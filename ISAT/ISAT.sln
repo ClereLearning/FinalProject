@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.7.33808.371
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ISAT.Server", "Server\ISAT.Server.csproj", "{0EFA44B0-2452-4576-AAB6-516079D1C34F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ISAT.Server", "Server\ISAT.Server.csproj", "{0EFA44B0-2452-4576-AAB6-516079D1C34F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ISAT.Client", "Client\ISAT.Client.csproj", "{418888A0-2496-4E48-962E-E697F9752BEF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ISAT.Client", "Client\ISAT.Client.csproj", "{418888A0-2496-4E48-962E-E697F9752BEF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ISAT.Shared", "Shared\ISAT.Shared.csproj", "{3F0C997B-2CCA-450C-87CB-2F78F6CE54D3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ISAT.Shared", "Shared\ISAT.Shared.csproj", "{3F0C997B-2CCA-450C-87CB-2F78F6CE54D3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
