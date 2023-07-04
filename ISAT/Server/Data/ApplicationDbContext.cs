@@ -1,9 +1,14 @@
-﻿using Duende.IdentityServer.EntityFramework.Options;
+﻿using Duende.IdentityServer.EntityFramework.Extensions;
+using Duende.IdentityServer.EntityFramework.Options;
+using Humanizer;
 using ISAT.Server.Models;
+using ISAT.Shared.Models;
 using Microsoft.AspNetCore.ApiAuthorization.IdentityServer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.Extensions.Options;
+using System.Reflection.Emit;
 
 namespace ISAT.Server.Data
 {
@@ -18,6 +23,7 @@ namespace ISAT.Server.Data
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
+                                 
 
             builder.HasDefaultSchema("ISAT");
             
@@ -70,8 +76,11 @@ namespace ISAT.Server.Data
                    entity.ToTable(name: "RoleClaim");
                }
                );
-            
         }
+
+        public DbSet<Gender> Genders { get; set; }
+        public DbSet<SexualOrientation> SexualOrientations { get; set; }
+        public DbSet<UsersType> UsersTypes { get; set; }
 
     }
 }
