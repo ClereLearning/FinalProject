@@ -1,0 +1,106 @@
+﻿@page "/sexualOrientationaddedit"
+@page "/sexualorientationaddedit/{Id:int}"
+@using ISAT.Shared.Models
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@inject ISexualOrientationService SexualOrientationService
+@inject NavigationManager NavigationManager
+@inject HttpClient Http
+@attribute [Authorize]
+
+@if (Id == null)
+{
+
+    <PageTitle> Adding a new Sexual Orientation </PageTitle>
+
+    <h3>Adding a new Sexual Orientation</h3>
+
+}
+else
+{
+
+    <PageTitle> Editing @sexualOrientation.Name </PageTitle>
+
+    <h3>Editing the @sexualOrientation.Name Sexual Orientation</h3>
+
+}
+
+<br />
+<hr />
+<EditForm Model="@sexualOrientation" OnValidSubmit="HandleSubmit">
+    <div class="row">
+        <div class="mb-3">
+            <label asp-for="Name" class="form-control">Name</label>
+            <InputText id="Name" @bind-Value="sexualOrientation.Name" class="form-control" aria-required="true"></InputText>
+        </div>
+        <div class="mb-3">
+            <label asp-for="Description" class="form-control">Description</label>
+            <InputText id="Description" @bind-Value="sexualOrientation.Description" class="form-control" aria-required="false"></InputText>
+        </div>
+    </div>
+    <div class="form-group">
+        <button type="submit" class="btn btn-primary">@btnLabel</button>
+        <button type="button" class="btn btn-light" @onclick="Cancel">Cancel</button>
+    </div>
+
+</EditForm>
+
+@code {
+    [Parameter]
+
+    public int? Id { get; set; }
+
+    SexualOrientation sexualOrientation = new SexualOrientation { };
+
+    protected List<SexualOrientation> sexualOrientations = new();
+
+    string btnLabel = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        btnLabel = Id == null ? "Save" : "Update";
+
+        await GetSexualOrientations();
+    }
+
+    protected async Task<List<SexualOrientation>> GetSexualOrientations()
+    {
+        sexualOrientations = await SexualOrientationService.GetSexualOrientations();
+        return sexualOrientations;
+    }
+
+    async Task HandleSubmit()
+    {
+        if (sexualOrientation.Id != 0)
+        {
+            btnLabel = "Update";
+            await SexualOrientationService.PutSexualOrientation(Id.Value, sexualOrientation);
+            NavigationManager.NavigateTo("/sexualOrientationmanagment", true);
+        }
+        else
+        {
+            sexualOrientation = await SexualOrientationService.PostSexualOrientation(sexualOrientation);
+            NavigationManager.NavigateTo("/sexualOrientationmanagment", true);
+        }
+
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (Id == null)
+        {
+            // create a sexualOrientation
+
+        }
+        else
+        {
+            sexualOrientation = await SexualOrientationService.GetSexualOrientation((int)Id);
+        }
+    }
+
+    protected void Cancel()
+    {
+        NavigationManager.NavigateTo("/sexualOrientationmanagment");
+    }
+
+}

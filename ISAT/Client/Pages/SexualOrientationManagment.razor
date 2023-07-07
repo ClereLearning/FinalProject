@@ -1,0 +1,125 @@
+﻿@page "/sexualorientationmanagment"
+@using ISAT.Shared.Models
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@using Microsoft.AspNetCore.Components.QuickGrid
+@inject ISexualOrientationService SexualOrientationService
+@inject NavigationManager NavigationManager
+@inject HttpClient Http
+@attribute [Authorize]
+
+
+<PageTitle> Sexual Orientation Managment </PageTitle>
+
+<h3>Sexual Orientation Managment</h3>
+
+<br />
+<hr />
+<div class="row">
+    <div class="col-md-6">
+        <a href='/sexualorientationaddedit' class="btn btn-primary" role="button">
+            <i class="oi oi-plus"></i>
+            Add Sexual Orientation
+        </a>
+    </div>
+</div>
+<br />
+<hr />
+<div class="row">
+    <br />
+    <div class="mb-3">
+        <label asp-for="Searching" class="form-control">Search Sexual Orientation</label>
+        <InputText id="Searching" @bind-Value="Searching" class="form-control" aria-required="true" @onkeypress="SearchFor" @onkeydown="SearchFor" @onkeyup="SearchFor"></InputText>
+    </div>
+    @if (Searching.Length > 0)
+    {
+        <div>
+            <button class="btn btn-danger" @onclick="SearchingReset"><i class="io oi-delete" /> </button>
+        </div>
+    }
+
+</div>
+<hr />
+<br />
+@if (sexualOrientationList == null)
+{
+    <p> loading </p>
+}
+else
+{
+    <QuickGrid Items="sexualOrientationList.AsQueryable()" Pagination="pagination">
+        <PropertyColumn Property="i => i.Name" Title="Name" Sortable="true" />
+        <PropertyColumn Property="i=> i.Description" Title="Description" Sortable="true" />
+        <TemplateColumn>
+            <button class="btn btn-primary" onclick="@(() => EditIt(context))"><i class="oi oi-pencil" /></button>
+            <button class="btn btn-primary" onclick="@(() => DeleteIt(context))"><i class="oi oi-trash" /></button>
+        </TemplateColumn>
+    </QuickGrid>
+    <Paginator State="@pagination" />
+
+}
+
+@code {
+    [Parameter]
+
+    public string Searching { get; set; } = string.Empty;
+
+    protected List<SexualOrientation> sexualOrientationList = new();
+
+    protected List<SexualOrientation> searchSexualOrientationList = new();
+
+    PaginationState pagination = new PaginationState { ItemsPerPage = 20 };
+
+    protected void SearchFor()
+    {
+        if (!string.IsNullOrEmpty(Searching))
+        {
+            sexualOrientationList = searchSexualOrientationList.Where(x => x.Name.IndexOf(Searching, StringComparison.OrdinalIgnoreCase) != -1)
+            .ToList();
+        }
+        else
+        {
+            sexualOrientationList = searchSexualOrientationList;
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetSexualOrientations();
+        SearchFor();
+    }
+
+    protected async Task GetSexualOrientations()
+    {
+        sexualOrientationList = await SexualOrientationService.GetSexualOrientations();
+        searchSexualOrientationList = sexualOrientationList;
+    }
+
+    public void Cancel()
+    {
+
+        NavigationManager.NavigateTo("/sexualorientationmanagment", true);
+    }
+
+    public void SearchingReset()
+    {
+        Searching = string.Empty;
+        sexualOrientationList = searchSexualOrientationList;
+    }
+
+    public void EditIt(SexualOrientation s)
+    {
+        NavigationManager.NavigateTo($"sexualorientationaddedit/{s.Id}");
+    }
+
+    public async void DeleteIt(SexualOrientation s)
+    {
+        Searching = "";
+        if (s.Id != 0)
+        {
+            await SexualOrientationService.DeleteSexualOrientation(s.Id);
+        }
+        Cancel();
+
+    }
+}

@@ -1,8 +1,8 @@
 global using ISAT.Client.Services.GenderService; // ISAT making global ref
 global using ISAT.Client.Services.UsersTypeService; // ISAT making global ref
+global using ISAT.Client.Services.SexualOrientationService; // ISAT making global ref
 global using ISAT.Shared.Models;
 using ISAT.Client;
-using ISAT.Client.Services.UsersTypeService;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
@@ -21,6 +21,7 @@ builder.Services.AddScoped(sp => sp.GetRequiredService<IHttpClientFactory>().Cre
 //ISAT adding ref
 builder.Services.AddScoped<IGenderService, GenderService>();
 builder.Services.AddScoped<IUsersTypeService, UsersTypeService>();
+builder.Services.AddScoped<ISexualOrientationService, SexualOrientationService>();
 
 builder.Services.AddApiAuthorization();
 
