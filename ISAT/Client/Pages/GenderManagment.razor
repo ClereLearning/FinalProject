@@ -1,0 +1,124 @@
+﻿@page "/gendermanagment"
+@using ISAT.Shared.Models
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@using Microsoft.AspNetCore.Components.QuickGrid
+@inject IGenderService GenderService
+@inject NavigationManager NavigationManager
+@inject HttpClient Http
+@attribute [Authorize]
+
+<PageTitle> Gender Managment </PageTitle>
+
+<h3>List of Genders</h3>
+<br />
+<hr />
+<div class="row">
+    <div class="col-md-6">
+        <a href='/genderaddedit' class="btn btn-primary" role="button">
+            <i class="oi oi-plus"></i>
+            Add Gender
+        </a>
+    </div>
+</div>
+<br />
+<hr />
+<div class="row">    
+    <br />
+    <div class="mb-3">
+        <label asp-for="Searching" class="form-control">Search Gender</label>
+        <InputText id="Searching" @bind-Value="Searching" class="form-control" aria-required="true" @onkeypress="SearchFor" @onkeydown="SearchFor" @onkeyup="SearchFor"></InputText>
+    </div>
+    @if (Searching.Length > 0)
+        {
+            <div>
+                <button class="btn btn-danger" @onclick="SearchingReset"><i class="io oi-delete"/> </button>
+            </div>
+        }
+     
+</div>
+<hr />
+<br />
+@if(genderList == null)
+{
+    <p> loading </p>
+}
+else
+{
+    <QuickGrid Items="genderList.AsQueryable()" Pagination="pagination">
+        <PropertyColumn Property="i => i.Name" Title="Name" Sortable="true"/>                
+        <PropertyColumn Property="i=> i.Description" Title="Description" Sortable="true" />
+        <TemplateColumn>
+            <button class="btn btn-primary" onclick="@(() => EditIt(context))"><i class="oi oi-pencil" /></button>
+            <button class="btn btn-primary" onclick="@(() => DeleteIt(context))"><i class="oi oi-trash" /></button>
+        </TemplateColumn>
+    </QuickGrid>
+    <Paginator State="@pagination" />
+
+}
+
+@code {
+    [Parameter]
+
+    public string Searching { get; set; } = string.Empty;
+
+    protected List<Gender> genderList = new();
+
+    protected List<Gender> searchGenderList = new();
+
+    PaginationState pagination = new PaginationState { ItemsPerPage = 20 };
+
+    protected void SearchFor()
+    {
+        if (!string.IsNullOrEmpty(Searching))
+        {
+            genderList = searchGenderList.Where(x => x.Name.IndexOf(Searching, StringComparison.OrdinalIgnoreCase) != -1)
+            .ToList();
+        }
+        else
+        {
+            genderList = searchGenderList;
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {        
+        await GetGenders();
+        SearchFor();
+    }
+
+    protected async Task GetGenders()
+    {
+        genderList = await GenderService.GetGenders();
+        searchGenderList = genderList;        
+    }
+
+    public void Cancel()
+    {
+
+        NavigationManager.NavigateTo("/gendermanagment", true);
+    }
+
+    public void SearchingReset()
+    {
+        Searching = string.Empty;
+        genderList = searchGenderList;
+    }
+
+    public void EditIt(Gender g)
+    {
+        NavigationManager.NavigateTo($"genderaddedit/{g.Id}");
+    }
+
+    public async void DeleteIt(Gender g)
+    {        
+        Searching = "";
+        if (g.Id != 0)
+        {
+            await GenderService.DeleteGender(g.Id);            
+        }
+        Cancel();
+
+    }
+
+}

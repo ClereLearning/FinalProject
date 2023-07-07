@@ -1,3 +1,5 @@
+global using ISAT.Client.Services.GenderService; // ISAT making global ref
+global using ISAT.Shared.Models;
 using ISAT.Client;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
@@ -12,6 +14,10 @@ builder.Services.AddHttpClient("ISAT.ServerAPI", client => client.BaseAddress = 
 
 // Supply HttpClient instances that include access tokens when making requests to the server project
 builder.Services.AddScoped(sp => sp.GetRequiredService<IHttpClientFactory>().CreateClient("ISAT.ServerAPI"));
+
+// custom services 
+//ISAT adding ref
+builder.Services.AddScoped<IGenderService, GenderService>();
 
 builder.Services.AddApiAuthorization();
 
