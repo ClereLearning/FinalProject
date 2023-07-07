@@ -1,0 +1,127 @@
+﻿@page "/userstypemanagment"
+@using ISAT.Shared.Models
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@using Microsoft.AspNetCore.Components.QuickGrid
+@inject IUsersTypeService UsersTypeService
+@inject NavigationManager NavigationManager
+@inject HttpClient Http
+@attribute [Authorize]
+
+
+<PageTitle> User's Type Managment </PageTitle>
+
+<h3>User's Type Managment</h3>
+
+<br />
+<hr />
+<div class="row">
+    <div class="col-md-6">
+        <a href='/userstypeaddedit' class="btn btn-primary" role="button">
+            <i class="oi oi-plus"></i>
+            Add User's Type
+        </a>
+    </div>
+</div>
+<br />
+<hr />
+<div class="row">
+    <br />
+    <div class="mb-3">
+        <label asp-for="Searching" class="form-control">Search User's Type</label>
+        <InputText id="Searching" @bind-Value="Searching" class="form-control" aria-required="true" @onkeypress="SearchFor" @onkeydown="SearchFor" @onkeyup="SearchFor"></InputText>
+    </div>
+    @if (Searching.Length > 0)
+    {
+        <div>
+            <button class="btn btn-danger" @onclick="SearchingReset"><i class="io oi-delete" /> </button>
+        </div>
+    }
+
+</div>
+<hr />
+<br />
+@if (usersTypeList == null)
+{
+    <p> loading </p>
+}
+else
+{
+    <QuickGrid Items="usersTypeList.AsQueryable()" Pagination="pagination">
+        <PropertyColumn Property="i => i.Name" Title="Name" Sortable="true" />
+        <PropertyColumn Property="i=> i.Description" Title="Description" Sortable="true" />
+        <TemplateColumn>
+            <button class="btn btn-primary" onclick="@(() => EditIt(context))"><i class="oi oi-pencil" /></button>
+            <button class="btn btn-primary" onclick="@(() => DeleteIt(context))"><i class="oi oi-trash" /></button>
+        </TemplateColumn>
+    </QuickGrid>
+    <Paginator State="@pagination" />
+
+}
+
+@code {
+
+    [Parameter]
+
+    public string Searching { get; set; } = string.Empty;
+
+    protected List<UsersType> usersTypeList = new();
+
+    protected List<UsersType> searchUsersTypeList = new();
+
+    PaginationState pagination = new PaginationState { ItemsPerPage = 20 };
+
+    protected void SearchFor()
+    {
+        if (!string.IsNullOrEmpty(Searching))
+        {
+            usersTypeList = searchUsersTypeList.Where(x => x.Name.IndexOf(Searching, StringComparison.OrdinalIgnoreCase) != -1)
+            .ToList();
+        }
+        else
+        {
+            usersTypeList = searchUsersTypeList;
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetUsersTypes();
+        SearchFor();
+    }
+
+    protected async Task GetUsersTypes()
+    {
+        usersTypeList = await UsersTypeService.GetUsersTypes();
+        searchUsersTypeList = usersTypeList;
+    }
+
+    public void Cancel()
+    {
+
+        NavigationManager.NavigateTo("/userstypemanagment", true);
+    }
+
+    public void SearchingReset()
+    {
+        Searching = string.Empty;
+        usersTypeList = searchUsersTypeList;
+    }
+
+    public void EditIt(UsersType g)
+    {
+        NavigationManager.NavigateTo($"userstypeaddedit/{g.Id}");
+    }
+
+    public async void DeleteIt(UsersType g)
+    {
+        Searching = "";
+        if (g.Id != 0)
+        {
+            await UsersTypeService.DeleteUsersType(g.Id);
+        }
+        Cancel();
+
+    }
+
+}
