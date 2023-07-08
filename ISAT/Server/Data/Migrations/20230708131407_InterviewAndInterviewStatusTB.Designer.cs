@@ -4,6 +4,7 @@ using ISAT.Server.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ISAT.Server.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230708131407_InterviewAndInterviewStatusTB")]
+    partial class InterviewAndInterviewStatusTB
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -278,70 +281,6 @@ namespace ISAT.Server.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Gender", "ISAT");
-                });
-
-            modelBuilder.Entity("ISAT.Shared.Models.Interview", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("Date")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid>("EmailToken")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<bool>("Emailed")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime>("Hour")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("InterviewStatusId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("IntervieweeId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Place")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("InterviewStatusId");
-
-                    b.HasIndex("IntervieweeId");
-
-                    b.ToTable("Interview", "ISAT");
-                });
-
-            modelBuilder.Entity("ISAT.Shared.Models.InterviewStatus", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("Inactive")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("InterviewStatus", "ISAT");
                 });
 
             modelBuilder.Entity("ISAT.Shared.Models.Interviewee", b =>
@@ -662,25 +601,6 @@ namespace ISAT.Server.Data.Migrations
                     b.Navigation("SexualOrientation");
 
                     b.Navigation("UsersType");
-                });
-
-            modelBuilder.Entity("ISAT.Shared.Models.Interview", b =>
-                {
-                    b.HasOne("ISAT.Shared.Models.InterviewStatus", "InterviewStatus")
-                        .WithMany()
-                        .HasForeignKey("InterviewStatusId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("ISAT.Shared.Models.Interviewee", "Interviewee")
-                        .WithMany()
-                        .HasForeignKey("IntervieweeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("InterviewStatus");
-
-                    b.Navigation("Interviewee");
                 });
 
             modelBuilder.Entity("ISAT.Shared.Models.Interviewee", b =>

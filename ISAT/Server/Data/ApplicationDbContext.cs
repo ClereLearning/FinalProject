@@ -23,11 +23,11 @@ namespace ISAT.Server.Data
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
-                                 
+
 
             builder.HasDefaultSchema("ISAT");
-            
-            
+
+
             builder.Entity<IdentityUser<string>>(
                 entity =>
                 {
@@ -43,7 +43,7 @@ namespace ISAT.Server.Data
                );
 
             builder.Entity<IdentityUserToken<string>>(
-                entity => 
+                entity =>
                 {
                     entity.ToTable(name: "UserToken");
                 }
@@ -82,6 +82,9 @@ namespace ISAT.Server.Data
         public DbSet<SexualOrientation> SexualOrientations { get; set; }
         public DbSet<UsersType> UsersTypes { get; set; }
         public DbSet<Interviewee> Interviewees { get; set; }
+        public DbSet<Interview> Interviews { get; set; }
+        public DbSet<InterviewStatus> InterviewsStatus { get; set; }
+        
 
     }
 }
