@@ -1,0 +1,118 @@
+﻿@page "/intervieweeaddedit"
+@page "/intervieweeaddedit/{Id:int}"
+@using ISAT.Shared.Models
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@inject IIntervieweeService IntervieweeService
+@inject NavigationManager NavigationManager
+@inject HttpClient Http
+@attribute [Authorize]
+
+@if (Id == null)
+{
+
+    <PageTitle> Adding a new Interviewee </PageTitle>
+
+    <h3>Adding a new Interviewee</h3>
+
+}
+else
+{
+
+    <PageTitle> Editing @interviewee.FirstName </PageTitle>
+
+    <h3>Editing the @interviewee.FirstName Interviewee</h3>
+
+}
+
+<br />
+<hr />
+<EditForm Model="@interviewee" OnValidSubmit="HandleSubmit">
+    <div class="row">
+        <div class="mb-3">
+            <label asp-for="Name" class="form-control">First Name</label>
+            <InputText id="Name" @bind-Value="interviewee.FirstName" class="form-control" aria-required="true"></InputText>
+        </div>
+        <div class="mb-3">
+            <label asp-for="LastName" class="form-control">Last Name</label>
+            <InputText id="LastName" @bind-Value="interviewee.LastName" class="form-control" aria-required="false"></InputText>
+        </div>
+        <div class="mb-3">
+            <label asp-for="SocialName" class="form-control">Social Name</label>
+            <InputText id="SocialName" @bind-Value="interviewee.SocialName" class="form-control" aria-required="false"></InputText>
+        </div>
+        <div class="mb-3">
+            <label asp-for="Email" class="form-control">Email</label>
+            <InputText id="Email" @bind-Value="interviewee.Email" class="form-control" aria-required="false"></InputText>
+        </div>
+        <div class="mb-3">
+            <label asp-for="PhoneNumber" class="form-control">Phone Number</label>
+            <InputText id="PhoneNumber" @bind-Value="interviewee.PhoneNumber" class="form-control" aria-required="false"></InputText>
+        </div>        
+    </div>
+    <div class="form-group">
+        <button type="submit" class="btn btn-primary">@btnLabel</button>
+        <button type="button" class="btn btn-light" @onclick="Cancel">Cancel</button>
+    </div>
+
+</EditForm>
+
+@code {
+    [Parameter]
+
+    public int? Id { get; set; }
+
+    Interviewee interviewee = new Interviewee { };
+
+    protected List<Interviewee> interviewees = new();
+
+    string btnLabel = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        btnLabel = Id == null ? "Save" : "Update";
+
+        await GetInterviewees();
+    }
+
+    protected async Task<List<Interviewee>> GetInterviewees()
+    {
+        interviewees = await IntervieweeService.GetInterviewees();
+        return interviewees;
+    }
+
+    async Task HandleSubmit()
+    {
+        if (interviewee.Id != 0)
+        {
+            btnLabel = "Update";
+            await IntervieweeService.PutInterviewee(Id.Value, interviewee);
+            NavigationManager.NavigateTo("/intervieweemanagment", true);
+        }
+        else
+        {
+            interviewee = await IntervieweeService.PostInterviewee(interviewee);
+            NavigationManager.NavigateTo("/intervieweemanagment", true);
+        }
+
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (Id == null)
+        {
+            // create a interviewee
+
+        }
+        else
+        {
+            interviewee = await IntervieweeService.GetInterviewee((int)Id);
+        }
+    }
+
+    protected void Cancel()
+    {
+        NavigationManager.NavigateTo("/intervieweemanagment");
+    }
+
+}

@@ -81,6 +81,7 @@ namespace ISAT.Server.Data
         public DbSet<Gender> Genders { get; set; }
         public DbSet<SexualOrientation> SexualOrientations { get; set; }
         public DbSet<UsersType> UsersTypes { get; set; }
+        public DbSet<Interviewee> Interviewees { get; set; }
 
     }
 }

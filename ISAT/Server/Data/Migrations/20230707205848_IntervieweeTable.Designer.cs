@@ -4,6 +4,7 @@ using ISAT.Server.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ISAT.Server.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230707205848_IntervieweeTable")]
+    partial class IntervieweeTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -278,52 +281,6 @@ namespace ISAT.Server.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Gender", "ISAT");
-                });
-
-            modelBuilder.Entity("ISAT.Shared.Models.Interviewee", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("FirstName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("GenderId")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("Inactive")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("LastName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PhoneNumber")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("SexualOrientationId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("SocialName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("GenderId");
-
-                    b.HasIndex("SexualOrientationId");
-
-                    b.ToTable("Interviewee", "ISAT");
                 });
 
             modelBuilder.Entity("ISAT.Shared.Models.SexualOrientation", b =>
@@ -595,21 +552,6 @@ namespace ISAT.Server.Data.Migrations
                     b.Navigation("SexualOrientation");
 
                     b.Navigation("UsersType");
-                });
-
-            modelBuilder.Entity("ISAT.Shared.Models.Interviewee", b =>
-                {
-                    b.HasOne("ISAT.Shared.Models.Gender", "Gender")
-                        .WithMany()
-                        .HasForeignKey("GenderId");
-
-                    b.HasOne("ISAT.Shared.Models.SexualOrientation", "SexualOrientation")
-                        .WithMany()
-                        .HasForeignKey("SexualOrientationId");
-
-                    b.Navigation("Gender");
-
-                    b.Navigation("SexualOrientation");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
