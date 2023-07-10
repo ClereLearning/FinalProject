@@ -38,6 +38,13 @@ namespace ISAT.Shared.Models
 
         public Guid EmailToken { get; set; }
 
+        public byte[]? AudioFile { get; set; }
+
+        public DateTime AudioDate { get; set; }
+
+        public bool AudioStatus { get; set; } = false;
+
+        public string FileName { get; set; } = string.Empty;
 
     }
 }

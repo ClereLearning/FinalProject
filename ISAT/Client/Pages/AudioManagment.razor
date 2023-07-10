@@ -1,0 +1,127 @@
+﻿@page "/audiomanagment"
+@using ISAT.Shared.Models
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@using Microsoft.AspNetCore.Components.QuickGrid
+@inject IInterviewService InterviewService
+@inject NavigationManager NavigationManager
+@inject HttpClient Http
+@attribute [Authorize]
+
+<PageTitle> Audio Managment </PageTitle>
+
+<h3>Audio Managment</h3>
+<br />
+<hr />
+<div class="row">
+    <div class="col-md-6">
+        <a href='/interviewaddedit' class="btn btn-primary" role="button">
+            <i class="oi oi-plus"></i>
+            List of Interviews and Audio Managment
+        </a>
+    </div>
+</div>
+<br />
+<hr />
+<div class="row">
+    <br />
+    <div class="mb-3">
+        <label asp-for="Searching" class="form-control">Search Interview</label>
+        <InputText id="Searching" @bind-Value="Searching" class="form-control" aria-required="true" @onkeypress="SearchFor" @onkeydown="SearchFor" @onkeyup="SearchFor"></InputText>
+    </div>
+    @if (Searching.Length > 0)
+    {
+        <div>
+            <button class="btn btn-danger" @onclick="SearchingReset"><i class="io oi-delete" /> </button>
+        </div>
+    }
+
+</div>
+<hr />
+<br />
+@if (interviewList == null)
+{
+    <p> loading </p>
+}
+else
+{
+    <QuickGrid Items="interviewList.AsQueryable()" Pagination="pagination">
+        <PropertyColumn Property="i => i.Place" Title="Place" Sortable="true" />
+        <PropertyColumn Property="i=> i.Date" Title="Date" Sortable="true" />
+        <PropertyColumn Property="i=> i.Hour" Title="Hour" Sortable="true" />
+        <PropertyColumn Property="i=> i.AudioDate" Title="Audio Upload Date" Sortable="true" />
+        <PropertyColumn Property="i=> i.AudioStatus" Title="Audio Status" Sortable="true" />        
+        <TemplateColumn>
+            <button class="btn btn-primary" onclick="@(() => EditIt(context))"><i class="oi oi-pencil" /></button>
+            <button class="btn btn-primary" onclick="@(() => DeleteIt(context))"><i class="oi oi-trash" /></button>
+        </TemplateColumn>
+    </QuickGrid>
+    <Paginator State="@pagination" />
+
+}
+
+@code {
+    [Parameter]
+
+    public string Searching { get; set; } = string.Empty;
+
+    protected List<Interview> interviewList = new();
+
+    protected List<Interview> searchInterviewList = new();
+
+    PaginationState pagination = new PaginationState { ItemsPerPage = 20 };
+
+    protected void SearchFor()
+    {
+        if (!string.IsNullOrEmpty(Searching))
+        {
+            interviewList = searchInterviewList.Where(x => x.Interviewee.FirstName.IndexOf(Searching, StringComparison.OrdinalIgnoreCase) != -1)
+            .ToList();
+        }
+        else
+        {
+            interviewList = searchInterviewList;
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetInterviews();
+        SearchFor();
+    }
+
+    protected async Task GetInterviews()
+    {
+        interviewList = await InterviewService.GetInterviews();
+        searchInterviewList = interviewList;
+    }
+
+    public void Cancel()
+    {
+
+        NavigationManager.NavigateTo("/audiomanagment", true);
+    }
+
+    public void SearchingReset()
+    {
+        Searching = string.Empty;
+        interviewList = searchInterviewList;
+    }
+
+    public void EditIt(Interview i)
+    {
+        NavigationManager.NavigateTo($"interviewaddedit/{i.Id}");
+    }
+
+    public async void DeleteIt(Interview i)
+    {
+        Searching = "";
+        if (i.Id != 0)
+        {
+            await InterviewService.DeleteInterview(i.Id);
+        }
+        Cancel();
+
+    }
+
+}

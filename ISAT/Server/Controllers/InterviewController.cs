@@ -38,8 +38,7 @@ namespace ISAT.Server.Controllers
             {
                 return NotFound();
             }
-
-            return interview;
+            return Ok((Interview)interview);            
         }
 
         // PUT: api/Interview/5        
