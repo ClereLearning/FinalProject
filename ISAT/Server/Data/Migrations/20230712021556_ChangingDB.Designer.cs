@@ -4,6 +4,7 @@ using ISAT.Server.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,13 +12,15 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ISAT.Server.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230712021556_ChangingDB")]
+    partial class ChangingDB
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasDefaultSchema("dbo")
+                .HasDefaultSchema("ISAT")
                 .HasAnnotation("ProductVersion", "8.0.0-preview.5.23280.1")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
@@ -70,7 +73,7 @@ namespace ISAT.Server.Data.Migrations
 
                     b.HasIndex("Expiration");
 
-                    b.ToTable("DeviceCodes", "dbo");
+                    b.ToTable("DeviceCodes", "ISAT");
                 });
 
             modelBuilder.Entity("Duende.IdentityServer.EntityFramework.Entities.Key", b =>
@@ -106,7 +109,7 @@ namespace ISAT.Server.Data.Migrations
 
                     b.HasIndex("Use");
 
-                    b.ToTable("Keys", "dbo");
+                    b.ToTable("Keys", "ISAT");
                 });
 
             modelBuilder.Entity("Duende.IdentityServer.EntityFramework.Entities.PersistedGrant", b =>
@@ -161,7 +164,7 @@ namespace ISAT.Server.Data.Migrations
 
                     b.HasIndex("SubjectId", "SessionId", "Type");
 
-                    b.ToTable("PersistedGrants", "dbo");
+                    b.ToTable("PersistedGrants", "ISAT");
                 });
 
             modelBuilder.Entity("ISAT.Server.Models.ApplicationUser", b =>
@@ -256,7 +259,7 @@ namespace ISAT.Server.Data.Migrations
 
                     b.HasIndex("UsersTypeId");
 
-                    b.ToTable("AspNetUsers", "dbo");
+                    b.ToTable("AspNetUsers", "ISAT");
                 });
 
             modelBuilder.Entity("ISAT.Shared.Models.Gender", b =>
@@ -277,7 +280,7 @@ namespace ISAT.Server.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Gender", "dbo");
+                    b.ToTable("Gender", "ISAT");
                 });
 
             modelBuilder.Entity("ISAT.Shared.Models.Interview", b =>
@@ -329,7 +332,7 @@ namespace ISAT.Server.Data.Migrations
 
                     b.HasIndex("IntervieweeId");
 
-                    b.ToTable("Interview", "dbo");
+                    b.ToTable("Interview", "ISAT");
                 });
 
             modelBuilder.Entity("ISAT.Shared.Models.InterviewStatus", b =>
@@ -354,7 +357,7 @@ namespace ISAT.Server.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("InterviewStatus", "dbo");
+                    b.ToTable("InterviewStatus", "ISAT");
                 });
 
             modelBuilder.Entity("ISAT.Shared.Models.Interviewee", b =>
@@ -400,7 +403,7 @@ namespace ISAT.Server.Data.Migrations
 
                     b.HasIndex("SexualOrientationId");
 
-                    b.ToTable("Interviewee", "dbo");
+                    b.ToTable("Interviewee", "ISAT");
                 });
 
             modelBuilder.Entity("ISAT.Shared.Models.SexualOrientation", b =>
@@ -421,7 +424,7 @@ namespace ISAT.Server.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("SexualOrientation", "dbo");
+                    b.ToTable("SexualOrientation", "ISAT");
                 });
 
             modelBuilder.Entity("ISAT.Shared.Models.UsersType", b =>
@@ -445,7 +448,7 @@ namespace ISAT.Server.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("UsersType", "dbo");
+                    b.ToTable("UsersType", "ISAT");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -472,7 +475,7 @@ namespace ISAT.Server.Data.Migrations
                         .HasDatabaseName("RoleNameIndex")
                         .HasFilter("[NormalizedName] IS NOT NULL");
 
-                    b.ToTable("AspNetRoles", "dbo");
+                    b.ToTable("AspNetRoles", "ISAT");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole<string>", b =>
@@ -491,7 +494,7 @@ namespace ISAT.Server.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Role", "dbo");
+                    b.ToTable("Role", "ISAT");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -516,7 +519,7 @@ namespace ISAT.Server.Data.Migrations
 
                     b.HasIndex("RoleId");
 
-                    b.ToTable("RoleClaim", "dbo");
+                    b.ToTable("RoleClaim", "ISAT");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUser<string>", b =>
@@ -568,7 +571,7 @@ namespace ISAT.Server.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("User", "dbo");
+                    b.ToTable("User", "ISAT");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
@@ -593,7 +596,7 @@ namespace ISAT.Server.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("UserClaim", "dbo");
+                    b.ToTable("UserClaim", "ISAT");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
@@ -617,7 +620,7 @@ namespace ISAT.Server.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("UserLogin", "dbo");
+                    b.ToTable("UserLogin", "ISAT");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
@@ -632,7 +635,7 @@ namespace ISAT.Server.Data.Migrations
 
                     b.HasIndex("RoleId");
 
-                    b.ToTable("UserRole", "dbo");
+                    b.ToTable("UserRole", "ISAT");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
@@ -653,7 +656,7 @@ namespace ISAT.Server.Data.Migrations
 
                     b.HasKey("UserId", "LoginProvider", "Name");
 
-                    b.ToTable("UserToken", "dbo");
+                    b.ToTable("UserToken", "ISAT");
                 });
 
             modelBuilder.Entity("ISAT.Server.Models.ApplicationUser", b =>

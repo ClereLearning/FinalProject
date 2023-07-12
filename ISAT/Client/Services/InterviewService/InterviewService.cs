@@ -1,4 +1,8 @@
-﻿using System.Net.Http.Json;
+﻿using ISAT.Shared.Models;
+using System.Collections.Generic;
+using System.Net.Http.Json;
+using System.Reflection;
+using System.Text.Json;
 
 namespace ISAT.Client.Services.InterviewService
 {
@@ -6,13 +10,14 @@ namespace ISAT.Client.Services.InterviewService
     {
         private readonly HttpClient _httpClient;
 
+
         public InterviewService(HttpClient http)
         {
             this._httpClient = http;
         }
 
         public List<Interview> Interviews { get; set; } = new List<Interview>();
-
+        public List<Interviewee> Interviewees { get ; set ; }
 
         public async Task<Interview> GetInterview(int id)
         {
@@ -73,6 +78,16 @@ namespace ISAT.Client.Services.InterviewService
                 return;
             }
             throw new Exception("Error during Interview Deleting");
+        }
+
+        public async Task<List<Interviewee>> GetInterviewees()
+        {
+            var result = await _httpClient.GetFromJsonAsync<List<Interviewee>>("api/interview/interviewees");
+            if (result != null)
+            {
+                return result;
+            }
+            throw new Exception("interviewees empty");
         }
     }
 }

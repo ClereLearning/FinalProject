@@ -74,7 +74,7 @@ else
         if (gender.Id != 0)
         {
             btnLabel = "Update";
-            await GenderService.PutGender(Id.Value, gender);
+            await GenderService.PutGender((Id == null ? 0 : Id.Value), gender);
             NavigationManager.NavigateTo("/gendermanagment", true);
         }
         else

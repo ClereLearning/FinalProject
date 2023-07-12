@@ -39,7 +39,7 @@ namespace ISAT.Server.Controllers
                 return NotFound();
             }
 
-            return interviewee;
+            return Ok( (Interviewee) interviewee);
         }
 
        

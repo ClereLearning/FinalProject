@@ -28,10 +28,12 @@ namespace ISAT.Shared.Models
         public DateTime Hour { get; set; }
 
         [Required]
-        public Interviewee Interviewee { get; set; }
+        [ForeignKey("IntervieweeId")]
+        public virtual required Interviewee Interviewee { get; set; }
 
         [Required]
-        public InterviewStatus InterviewStatus { get; set; }
+        [ForeignKey("InterviewStatusId")]
+        public virtual required InterviewStatus InterviewStatus { get; set; }
 
         [Required]
         public bool Emailed { get; set; } = false;

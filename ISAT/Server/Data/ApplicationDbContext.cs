@@ -25,7 +25,7 @@ namespace ISAT.Server.Data
             base.OnModelCreating(builder);
 
 
-            builder.HasDefaultSchema("ISAT");
+            builder.HasDefaultSchema("dbo");
 
 
             builder.Entity<IdentityUser<string>>(

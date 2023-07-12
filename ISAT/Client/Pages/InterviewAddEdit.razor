@@ -27,18 +27,33 @@ else
 <br />
 <hr />
 <EditForm Model="@interview" OnValidSubmit="HandleSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
     <div class="row">
+        <div class="mb-3">
+            <label asp-for="Place" class="form-control">Interviewee</label>
+            <InputSelect @bind-Value="interview.Interviewee.Id" class="form-select">                
+                @foreach (var item in interviewees)
+                {
+                    <option value="@item.Id"> @item.FirstName @item.LastName </option>
+                }
+            </InputSelect>
+        </div>
         <div class="mb-3">
             <label asp-for="Place" class="form-control">Place</label>
             <InputText id="Place" @bind-Value="interview.Place" class="form-control" aria-required="true"></InputText>
-        </div>                
-        <div class="mb-3">
-            <label asp-for="Hour" class="form-control">Hour</label>
-            <InputDate @bind-Value:format="HH:mm:ss" @bind-Value="@interview.Hour" class="form-control" aria-required="true" />
-        </div>
+        </div>                       
         <div class="mb-3">
             <label asp-for="Date" class="form-control">Date</label>
-            <InputDate @bind-Value:format="dd/MM/yyyy" @bind-Value="@interview.Date" class="form-control" aria-required="true" />
+            <InputDate InitialDate="DateDefault" @bind-Value:format="dd/MM/yyyy" @bind-Value="@interview.Date" class="form-control" aria-required="true" />
+        </div>
+        <div class="mb-3">
+            <label asp-for="Hour" class="form-control">Starting Time</label>
+            <InputDate Type="InputDateType.Time" @bind-Value:format="HH:mm:ss" @bind-Value="@interview.Hour" class="form-control" aria-required="true" />
+        </div>
+        <div class="mb-3">
+            <label asp-for="Hour" class="form-control">Duration</label>
+            <InputDate Type="InputDateType.Time" @bind-Value:format="HH:mm:ss" @bind-Value="@interview.Hour" class="form-control" aria-required="true" />
         </div>
     </div>
     <div class="form-group">
@@ -53,7 +68,17 @@ else
 
     public int? Id { get; set; }
 
-    Interview interview = new Interview { };
+    Interview interview = new Interview()
+        {
+            Interviewee = new Interviewee { },
+            InterviewStatus = new InterviewStatus{}
+    };
+
+    InterviewStatus interviewStatus = new InterviewStatus { };
+
+    Interviewee interviewee = new Interviewee { };
+
+    protected List<Interviewee> interviewees = new();
 
     protected List<Interview> interviews = new();
 
@@ -64,6 +89,14 @@ else
         btnLabel = Id == null ? "Save" : "Update";
 
         await GetInterviews();
+
+        await GetInterviewees();
+    }
+
+    protected async Task<List<Interviewee>> GetInterviewees()
+    {
+        interviewees = await InterviewService.GetInterviewees();
+        return interviewees;
     }
 
     protected async Task<List<Interview>> GetInterviews()
@@ -77,7 +110,7 @@ else
         if (interview.Id != 0)
         {
             btnLabel = "Update";
-            await InterviewService.PutInterview(Id.Value, interview);
+            await InterviewService.PutInterview((Id == null ? 0 : Id.Value), interview);
             NavigationManager.NavigateTo("/interviewmanagment", true);
         }
         else
@@ -105,5 +138,7 @@ else
     {
         NavigationManager.NavigateTo("/interviewmanagment");
     }
+
+    public DateTime DateDefault { get; set; }
 
 }

@@ -86,7 +86,7 @@ else
         if (interviewee.Id != 0)
         {
             btnLabel = "Update";
-            await IntervieweeService.PutInterviewee(Id.Value, interviewee);
+            await IntervieweeService.PutInterviewee((Id == null ? 0 : Id.Value), interviewee);
             NavigationManager.NavigateTo("/intervieweemanagment", true);
         }
         else

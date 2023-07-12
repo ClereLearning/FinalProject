@@ -23,7 +23,7 @@ namespace ISAT.Server.Controllers
 
         // GET: api/Interview
         [HttpGet]
-        public async Task<ActionResult<List<Interview>>> GetInterviews()
+        public async Task<ActionResult<IEnumerable<Interview>>> GetInterviews()
         {
             return await _context.Interviews.ToListAsync();
         }
@@ -38,7 +38,8 @@ namespace ISAT.Server.Controllers
             {
                 return NotFound();
             }
-            return Ok((Interview)interview);            
+
+            return interview;
         }
 
         // PUT: api/Interview/5        
@@ -100,6 +101,13 @@ namespace ISAT.Server.Controllers
         private bool InterviewExists(int id)
         {
             return _context.Interviews.Any(e => e.Id == id);
+        }
+
+        // GET: api/Interview/interviewees
+        [HttpGet("interviewees")]
+        public async Task<ActionResult<List<Interviewee>>> GetInterviewees()
+        {
+            return await _context.Interviewees.ToListAsync();
         }
     }
 }

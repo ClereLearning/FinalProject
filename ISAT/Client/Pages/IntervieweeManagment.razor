@@ -10,7 +10,7 @@
 
 <PageTitle> Interviewee Managment </PageTitle>
 
-<h3>List of Interviewees</h3>
+<h3>Interviewee Managment</h3>
 <br />
 <hr />
 <div class="row">
@@ -37,6 +37,7 @@
     }
 
 </div>
+<h3>List of Interviewees</h3>
 <hr />
 <br />
 @if (intervieweeList == null)
@@ -49,8 +50,8 @@ else
         <PropertyColumn Property="i => i.FirstName" Title="First Name" Sortable="true" />
         <PropertyColumn Property="i=> i.LastName" Title="Last Name" Sortable="true" />
         <PropertyColumn Property="i=> i.SocialName" Title="Social Name" Sortable="true" />
-        <PropertyColumn Property="i=> i.Email" Title="Email" Sortable="true" />
-        <PropertyColumn Property="i=> i.PhoneNumber" Title="PhoneNumber" Sortable="true" />
+        <PropertyColumn Property="i=> i.Email" Title="E-mail" Sortable="true" />
+        <PropertyColumn Property="i=> i.PhoneNumber" Title="Phone number" Sortable="true" />
         <PropertyColumn Property="i=> i.Inactive" Title="Inactive" Sortable="true" />
         <TemplateColumn>
             <button class="btn btn-primary" onclick="@(() => EditIt(context))"><i class="oi oi-pencil" /></button>

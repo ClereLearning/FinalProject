@@ -27,6 +27,7 @@ builder.Services.AddScoped<IUsersTypeService, UsersTypeService>();
 builder.Services.AddScoped<ISexualOrientationService, SexualOrientationService>();
 builder.Services.AddScoped<IIntervieweeService, IntervieweeService>();
 builder.Services.AddScoped<IInterviewService, InterviewService>();
+builder.Services.AddScoped<IInterviewStatusService, InterviewStatusService>();
 
 builder.Services.AddApiAuthorization();
 

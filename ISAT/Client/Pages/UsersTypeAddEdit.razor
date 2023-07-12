@@ -74,7 +74,7 @@ else
         if (usersType.Id != 0)
         {
             btnLabel = "Update";
-            await UsersTypeService.PutUsersType(Id.Value, usersType);
+            await UsersTypeService.PutUsersType((Id == null ? 0 : Id.Value), usersType);
             NavigationManager.NavigateTo("/userstypemanagment", true);
         }
         else

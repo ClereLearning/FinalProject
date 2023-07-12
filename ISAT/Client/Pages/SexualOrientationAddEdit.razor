@@ -74,7 +74,7 @@ else
         if (sexualOrientation.Id != 0)
         {
             btnLabel = "Update";
-            await SexualOrientationService.PutSexualOrientation(Id.Value, sexualOrientation);
+            await SexualOrientationService.PutSexualOrientation((Id == null ? 0 : Id.Value), sexualOrientation);
             NavigationManager.NavigateTo("/sexualOrientationmanagment", true);
         }
         else
