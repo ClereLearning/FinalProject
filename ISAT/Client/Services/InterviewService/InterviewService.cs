@@ -10,16 +10,24 @@ namespace ISAT.Client.Services.InterviewService
     {
         private readonly HttpClient _httpClient;
 
-
         public InterviewService(HttpClient http)
         {
-            this._httpClient = http;
+            this._httpClient = http;            
         }
 
         public List<Interview> Interviews { get; set; } = new List<Interview>();
-        public List<Interviewee> Interviewees { get ; set ; }
 
-        public async Task<Interview> GetInterview(int id)
+        public async Task DeleteInterview(Guid id)
+        {
+            var result = await _httpClient.DeleteAsync($"api/interview/{id}");
+            if (result != null)
+            {
+                return;
+            }
+            throw new Exception("Error during Interview Deleting");
+        }
+
+        public async Task<Interview> GetInterview(Guid id)
         {
             var result = await _httpClient.GetFromJsonAsync<Interview>($"api/interview/{id}");
             if (result != null)
@@ -27,6 +35,16 @@ namespace ISAT.Client.Services.InterviewService
                 return result;
             }
             throw new Exception("Interview not found!");
+        }
+
+        public async Task<List<Interviewee>> GetInterviewees()
+        {
+            var result = await _httpClient.GetFromJsonAsync<List<Interviewee>>("api/interview/interviewees");
+            if (result != null)
+            {
+                return result;
+            }
+            throw new Exception("interviewees empty");
         }
 
         public async Task<List<Interview>> GetInterviews()
@@ -39,7 +57,7 @@ namespace ISAT.Client.Services.InterviewService
             throw new Exception("Interview empty");
         }
 
-        public async Task<Interview> PostInterview(Interview interview)
+       public async Task<Interview> PostInterview(Interview interview)
         {
             var result = await _httpClient.PostAsJsonAsync("api/interview", interview);
             var response = await result.Content.ReadFromJsonAsync<Interview>();
@@ -48,9 +66,9 @@ namespace ISAT.Client.Services.InterviewService
                 return response;
             }
             throw new Exception("Error during Interview creation");
-        }
+        }       
 
-        public async Task PutInterview(int id, Interview interview)
+        public async Task PutInterview(Guid id, Interview interview)
         {
             var result = await _httpClient.PutAsJsonAsync($"api/interview/{id}", interview);
             if (result != null)
@@ -61,33 +79,15 @@ namespace ISAT.Client.Services.InterviewService
             throw new Exception("Error during Interview Update");
         }
 
-        private async Task setObjResponse(HttpResponseMessage result)
+        public async Task UpdateStatus(Guid id, int statusId) 
         {
-            var response = await result.Content.ReadFromJsonAsync<List<Interview>>();
-            if ((result != null) && (response != null))
-            {
-                Interviews = response;
-            }
-        }
-
-        public async Task DeleteInterview(int id)
-        {
-            var result = await _httpClient.DeleteAsync($"api/interview/{id}");
+            var result = await _httpClient.DeleteAsync($"api/interview/updatestatus/{id}/{statusId}");
             if (result != null)
             {
                 return;
             }
-            throw new Exception("Error during Interview Deleting");
-        }
+            throw new Exception("Error during Interview UpdateStatus");
 
-        public async Task<List<Interviewee>> GetInterviewees()
-        {
-            var result = await _httpClient.GetFromJsonAsync<List<Interviewee>>("api/interview/interviewees");
-            if (result != null)
-            {
-                return result;
-            }
-            throw new Exception("interviewees empty");
         }
     }
 }

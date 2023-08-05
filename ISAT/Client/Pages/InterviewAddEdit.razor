@@ -1,14 +1,17 @@
 ﻿@page "/interviewaddedit"
-@page "/interviewaddedit/{Id:int}"
+@page "/interviewaddedit/{Id:guid}"
 @using ISAT.Shared.Models
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using System.Globalization;
 @inject IInterviewService InterviewService
+@inject IInterviewStatusService InterviewStatusService
 @inject NavigationManager NavigationManager
 @inject HttpClient Http
 @attribute [Authorize]
 
-@if (Id == null)
+@if (Id == Guid.Empty)
 {
 
     <PageTitle> Adding a new Interview </PageTitle>
@@ -18,9 +21,12 @@
 else
 {
 
-    <PageTitle> Editing @interview.Interviewee.FirstName - @interview.Date!.ToShortDateString()  </PageTitle>
 
-    <h3>Editing the @interview.Interviewee.FirstName - @interview.Date!.ToShortDateString() Interview</h3>
+    <PageTitle>
+        Editing the Interview with @interviewee.SocialName @interview.StartTime.ToLongDateString() @interview.StartTime.ToShortTimeString()
+    </PageTitle>
+
+    <h3>Editing the Interview with @interviewee.SocialName <br /> @interview.StartTime.ToLongDateString() @interview.StartTime.ToShortTimeString() </h3>
 
 }
 
@@ -31,47 +37,83 @@ else
     <ValidationSummary />
     <div class="row">
         <div class="mb-3">
-            <label asp-for="Place" class="form-control">Interviewee</label>
-            <InputSelect @bind-Value="interview.Interviewee.Id" class="form-select">                
+            <label asp-for="Interviewee" class="form-control">Interviewee</label>
+            <InputSelect @bind-Value="interview.IntervieweeId" class="form-select">
                 @foreach (var item in interviewees)
                 {
-                    <option value="@item.Id"> @item.FirstName @item.LastName </option>
+                    <option value="@item.Id">  @item.SocialName - @item.FirstName @item.LastName </option>
                 }
             </InputSelect>
         </div>
         <div class="mb-3">
             <label asp-for="Place" class="form-control">Place</label>
             <InputText id="Place" @bind-Value="interview.Place" class="form-control" aria-required="true"></InputText>
-        </div>                       
+        </div>
         <div class="mb-3">
             <label asp-for="Date" class="form-control">Date</label>
-            <InputDate InitialDate="DateDefault" @bind-Value:format="dd/MM/yyyy" @bind-Value="@interview.Date" class="form-control" aria-required="true" />
+            <InputDate id="Date" Type="InputDateType.Date" @bind-Value="@interview.Date" @onblur="@(x => ShowInterviewsByDate())" class="form-control" aria-required="true" />
+        </div>
+        <div>
+            <p><h6><i>@TitleDisplaySchedule</i></h6></p>
+            <QuickGrid Items="ScheduleList.AsQueryable()" Pagination="pagination" >                
+                <PropertyColumn Property="i=> i.StartTime" Title="Start Time" Format="HH:mm" Sortable="true" />
+                <PropertyColumn Property="i=> i.EndTime" Title="End Time" Format="HH:mm" Sortable="true" />                
+                <PropertyColumn Property="i => i.InterviewStatus.Status" Title="Status" Sortable="true" />                
+            </QuickGrid>
+            <Paginator State="@pagination" />
         </div>
         <div class="mb-3">
-            <label asp-for="Hour" class="form-control">Starting Time</label>
-            <InputDate Type="InputDateType.Time" @bind-Value:format="HH:mm:ss" @bind-Value="@interview.Hour" class="form-control" aria-required="true" />
+            <label asp-for="StartTime" class="form-control">Starting Time</label>
+            <InputDate id="StartTime" Type="InputDateType.Time" @bind-Value="@interview.StartTime" class="form-control" aria-required="true" />
         </div>
         <div class="mb-3">
-            <label asp-for="Hour" class="form-control">Duration</label>
-            <InputDate Type="InputDateType.Time" @bind-Value:format="HH:mm:ss" @bind-Value="@interview.Hour" class="form-control" aria-required="true" />
+            <label asp-for="EndTime" class="form-control">Ending Time</label>
+            <InputDate id="EndTime" Type="InputDateType.Time" @bind-Value="@interview.EndTime" class="form-control" aria-required="true" />
+        </div>
+        <div class="mb-3">
+            <label asp-for="Observation" class="form-control">Observation</label>
+            <InputText id="Observation" @bind-Value="interview.Observation" class="form-control" aria-required="true"></InputText>
+        </div>
+        <div class="mb-3">
+            <label asp-for="InterviewStatus" class="form-control">Interview Status</label>
+            <InputSelect @bind-Value="interview.InterviewStatusId" class="form-select">
+                @foreach (var item in interviewsStatus)
+                {
+                    <option value="@item.Id"> @item.Status</option>
+                }
+            </InputSelect>
+        </div>
+    </div>
+    <div>
+        <div class="alert alert-primary @DisplayAlert" role="alert">
+            @DisplayContentAlert
         </div>
     </div>
     <div class="form-group">
         <button type="submit" class="btn btn-primary">@btnLabel</button>
         <button type="button" class="btn btn-light" @onclick="Cancel">Cancel</button>
     </div>
-
+    <br />
 </EditForm>
 
 @code {
     [Parameter]
 
-    public int? Id { get; set; }
+    public Guid Id { get; set; }
+
+    private string DisplayAlert { get; set; } = "d-none";
+
+    private string DisplayContentAlert { get; set; } = "";
+
+    private string DisplaySchedule { get; set; } = "d-none";
+
+    private string TitleDisplaySchedule { get; set; } = "";
 
     Interview interview = new Interview()
-        {
-            Interviewee = new Interviewee { },
-            InterviewStatus = new InterviewStatus{}
+    {     /*
+    Interviewee = new Interviewee { },
+    InterviewStatus = new InterviewStatus{}
+    */
     };
 
     InterviewStatus interviewStatus = new InterviewStatus { };
@@ -82,15 +124,31 @@ else
 
     protected List<Interview> interviews = new();
 
+    protected List<InterviewStatus> interviewsStatus = new();
+
+    protected List<Interview> ScheduleList = new();
+    PaginationState pagination = new PaginationState { ItemsPerPage = 10 };
+
     string btnLabel = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
-        btnLabel = Id == null ? "Save" : "Update";
+        btnLabel = !String.IsNullOrEmpty(Id.ToString()) ? "Save" : "Update";
+
+        DateDefault = DateTime.Today;
+
+        @if (Id == Guid.Empty)
+        {
+            interview.Date = DateDefault;
+            interview.StartTime = DateTime.Now.AddMinutes(5);
+            interview.EndTime = DateTime.Now.AddMinutes(5).AddHours(1);
+        }
 
         await GetInterviews();
 
         await GetInterviewees();
+
+        await GetInterviewsStatus();
     }
 
     protected async Task<List<Interviewee>> GetInterviewees()
@@ -99,40 +157,175 @@ else
         return interviewees;
     }
 
+    protected async Task<List<InterviewStatus>> GetInterviewsStatus()
+    {
+        interviewsStatus = await InterviewStatusService.GetInterviewsStatus();
+        interviewsStatus = interviewsStatus.Where(s => s.Id < 5).ToList();
+        return interviewsStatus;
+    }
+
     protected async Task<List<Interview>> GetInterviews()
     {
         interviews = await InterviewService.GetInterviews();
         return interviews;
     }
 
-    async Task HandleSubmit()
+    protected void PreparingData()
     {
-        if (interview.Id != 0)
+        interview.StartTime = interview.Date.AddHours(interview.StartTime.Hour).AddMinutes(interview.StartTime.Minute);
+        interview.EndTime = interview.Date.AddHours(interview.EndTime.Hour).AddMinutes(interview.EndTime.Minute);
+    }
+
+    protected Boolean CheckTiming()
+    {
+        if ((interview.StartTime > interview.EndTime) || (interview.StartTime == interview.EndTime))
         {
-            btnLabel = "Update";
-            await InterviewService.PutInterview((Id == null ? 0 : Id.Value), interview);
-            NavigationManager.NavigateTo("/interviewmanagment", true);
+            DisplayContentAlert = "The Ending time must be greater than the Starting time";
+            return false;
         }
         else
         {
-            interview = await InterviewService.PostInterview(interview);
-            NavigationManager.NavigateTo("/interviewmanagment", true);
+            return true;
         }
 
+    }
+
+
+
+    async Task ShowInterviewsByDate()
+    {      
+
+        if (!String.IsNullOrEmpty(interview.Date.ToString()))
+        {
+            TitleDisplaySchedule = "Hourly Schedule " + interview.Date.ToShortDateString();
+            var Schedules = await InterviewService.GetInterviews();
+            ScheduleList = Schedules.Where(x => (x.Date == interview.Date)).OrderBy(x => x.StartTime)
+        .ToList();
+        }
+
+        /*
+        CultureInfo provider = CultureInfo.InvariantCulture;
+
+            if (s is not null)
+            {
+            DateTime Starting = DateTime.ParseExact(s, "d", provider);
+            DateTime Ending = DateTime.ParseExact(s, "d", provider);
+            Ending = Ending.AddHours(23).AddMinutes(59);
+            await GetInterviews();
+            interviews.Where(i => i.StartTime >= Starting && i.EndTime <= Ending);
+    }
+    */
+    }
+
+
+    protected Boolean CheckDate(List<Interview>? Schedules)
+    {
+        if (interview.Date < DateDefault)
+        {
+            DisplayContentAlert = "The Interview Date must be equal or greater than the today";
+            return false;
+        }
+
+
+        if (interview.Date == DateDefault)
+        {
+            if (interview.StartTime < DateTime.Now)
+            {
+                DisplayContentAlert = "The Start time must be greater than " + DateTime.Now;
+                return false;
+            }
+
+            if (interview.EndTime < interview.StartTime)
+            {
+                DisplayContentAlert = "The End time must be greater than the Start time ";
+                return false;
+            }
+
+        }
+
+
+        if (Schedules != null)
+        {
+            var ScheduleBooked = Schedules.Where
+            (
+                x => (x.Date >= interview.Date) && 
+                (
+                    (x.StartTime <= interview.Date.AddHours(interview.EndTime.Hour).AddMinutes(interview.EndTime.Minute))
+                 && 
+                    (x.StartTime >= interview.Date.AddHours(interview.StartTime.Hour).AddMinutes(interview.StartTime.Minute))
+                )
+            ).ToList();
+
+            if (ScheduleBooked.Count > 0)
+            {
+                DisplayContentAlert = "Book no available. Please see the Hourly Schedule ";
+                return false;
+            }
+        }
+
+
+        return true;
+    }
+
+    async Task HandleSubmit()
+    {
+        DisplayContentAlert = "";
+        PreparingData();
+        var Schedules = await InterviewService.GetInterviews();
+        if (CheckDate(Schedules) && CheckTiming())
+        {
+            @if (!(Id == Guid.Empty))
+            {
+                btnLabel = "Update";
+                interview.Interviewee = null;
+                interview.InterviewStatus = null;
+                await InterviewService.PutInterview(Id, interview);
+                DisplayContentAlert = "Saved";
+                DisplayAlert = "";
+                NavigationManager.NavigateTo("/interviewmanagment", true);
+               
+            }
+            else
+            {
+                interview.EmailToken = Guid.NewGuid();
+                interview = await InterviewService.PostInterview(interview);
+                NavigationManager.NavigateTo("/interviewmanagment", true);
+                DisplayAlert = "";
+            }
+
+        }
+        else
+        {
+            DisplayAlert = "";
+        }
     }
 
     protected override async Task OnParametersSetAsync()
     {
-        if (Id == null)
+        @if (Id == Guid.Empty)
         {
-            // create a interview
+            interviewStatus = interviewsStatus.Where(x => x.Status.IndexOf("New", StringComparison.OrdinalIgnoreCase) != -1).FirstOrDefault();
+            interview.InterviewStatusId = interviewStatus.Id;
+
+            interviewee = interviewees.FirstOrDefault();
+            interview.IntervieweeId = interviewee.Id;
+
+            var Schedules = await InterviewService.GetInterviews();
+            TitleDisplaySchedule = "Hourly Schedule " + DateDefault.ToShortDateString();
+            ScheduleList = Schedules.Where(x => (x.Date == DateDefault)).OrderBy(x => x.StartTime)
+            .ToList();
 
         }
         else
         {
-            interview = await InterviewService.GetInterview((int)Id);
+            interview = await InterviewService.GetInterview(Id);
+            interviewee = interview.Interviewee;
+            var Schedules = await InterviewService.GetInterviews();
+            TitleDisplaySchedule = "Hourly Schedule " + interview.Date.ToShortDateString();
+            ScheduleList = Schedules.Where(x => (x.Date == interview.Date)).OrderBy(x => x.StartTime)
+            .ToList();
         }
-    }
+    }    
 
     protected void Cancel()
     {

@@ -7,9 +7,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ISAT.Server.Data;
 using ISAT.Shared.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ISAT.Server.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class InterviewStatusController : ControllerBase

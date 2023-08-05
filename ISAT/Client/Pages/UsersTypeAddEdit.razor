@@ -1,5 +1,5 @@
 ﻿@page "/userstypeaddedit"
-@page "/userstypeaddedit/{Id:int}"
+@page "/userstypeaddedit/{Id:guid}"
 @using ISAT.Shared.Models
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.WebAssembly.Authentication
@@ -8,7 +8,7 @@
 @inject HttpClient Http
 @attribute [Authorize]
 
-@if (Id == null)
+@if (Id == Guid.Empty)
 {
 
     <PageTitle> Adding a new User's Type </PageTitle>
@@ -48,7 +48,7 @@ else
 @code {
     [Parameter]
 
-    public int? Id { get; set; }
+    public Guid Id { get; set; }
 
     UsersType usersType = new UsersType { };
 
@@ -58,7 +58,7 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        btnLabel = Id == null ? "Save" : "Update";
+        btnLabel = !String.IsNullOrEmpty(Id.ToString()) ? "Save" : "Update";
 
         await GetUsersTypes();
     }
@@ -71,10 +71,10 @@ else
 
     async Task HandleSubmit()
     {
-        if (usersType.Id != 0)
+        @if (!(usersType.Id == Guid.Empty))        
         {
             btnLabel = "Update";
-            await UsersTypeService.PutUsersType((Id == null ? 0 : Id.Value), usersType);
+            await UsersTypeService.PutUsersType(Id, usersType);
             NavigationManager.NavigateTo("/userstypemanagment", true);
         }
         else
@@ -87,14 +87,14 @@ else
 
     protected override async Task OnParametersSetAsync()
     {
-        if (Id == null)
+        if (Id == Guid.Empty)        
         {
             // create a usersType
 
         }
         else
         {
-            usersType = await UsersTypeService.GetUsersType((int)Id);
+            usersType = await UsersTypeService.GetUsersType(Id);
         }
     }
 

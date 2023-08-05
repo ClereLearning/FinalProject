@@ -47,9 +47,9 @@
 else
 {
     <QuickGrid Items="intervieweeList.AsQueryable()" Pagination="pagination">
-        <PropertyColumn Property="i => i.FirstName" Title="First Name" Sortable="true" />
-        <PropertyColumn Property="i=> i.LastName" Title="Last Name" Sortable="true" />
         <PropertyColumn Property="i=> i.SocialName" Title="Social Name" Sortable="true" />
+        <PropertyColumn Property="i => i.FirstName" Title="First Name" Sortable="true" />
+        <PropertyColumn Property="i=> i.LastName" Title="Last Name" Sortable="true" />        
         <PropertyColumn Property="i=> i.Email" Title="E-mail" Sortable="true" />
         <PropertyColumn Property="i=> i.PhoneNumber" Title="Phone number" Sortable="true" />
         <PropertyColumn Property="i=> i.Inactive" Title="Inactive" Sortable="true" />
@@ -118,7 +118,7 @@ else
     public async void DeleteIt(Interviewee i)
     {
         Searching = "";
-        if (i.Id != 0)
+        @if (!(i.Id == Guid.Empty))
         {
             await IntervieweeService.DeleteInterviewee(i.Id);
         }

@@ -113,7 +113,7 @@ else
     public async void DeleteIt(Gender g)
     {        
         Searching = "";
-        if (g.Id != 0)
+        @if (!(g.Id == Guid.Empty))
         {
             await GenderService.DeleteGender(g.Id);            
         }

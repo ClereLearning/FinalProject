@@ -9,19 +9,19 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace ISAT.Server.Data.Migrations
+namespace ISAT.Server.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230708131407_InterviewAndInterviewStatusTB")]
-    partial class InterviewAndInterviewStatusTB
+    [Migration("20230722135433_DatabaseUpdate2")]
+    partial class DatabaseUpdate2
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasDefaultSchema("ISAT")
-                .HasAnnotation("ProductVersion", "8.0.0-preview.5.23280.1")
+                .HasDefaultSchema("dbo")
+                .HasAnnotation("ProductVersion", "8.0.0-preview.6.23329.4")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -73,7 +73,7 @@ namespace ISAT.Server.Data.Migrations
 
                     b.HasIndex("Expiration");
 
-                    b.ToTable("DeviceCodes", "ISAT");
+                    b.ToTable("DeviceCodes", "dbo");
                 });
 
             modelBuilder.Entity("Duende.IdentityServer.EntityFramework.Entities.Key", b =>
@@ -109,7 +109,7 @@ namespace ISAT.Server.Data.Migrations
 
                     b.HasIndex("Use");
 
-                    b.ToTable("Keys", "ISAT");
+                    b.ToTable("Keys", "dbo");
                 });
 
             modelBuilder.Entity("Duende.IdentityServer.EntityFramework.Entities.PersistedGrant", b =>
@@ -164,7 +164,7 @@ namespace ISAT.Server.Data.Migrations
 
                     b.HasIndex("SubjectId", "SessionId", "Type");
 
-                    b.ToTable("PersistedGrants", "ISAT");
+                    b.ToTable("PersistedGrants", "dbo");
                 });
 
             modelBuilder.Entity("ISAT.Server.Models.ApplicationUser", b =>
@@ -190,8 +190,8 @@ namespace ISAT.Server.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("GenderId")
-                        .HasColumnType("int");
+                    b.Property<Guid?>("GenderId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<bool>("Inactive")
                         .HasColumnType("bit");
@@ -226,8 +226,8 @@ namespace ISAT.Server.Data.Migrations
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("SexualOrientationId")
-                        .HasColumnType("int");
+                    b.Property<Guid?>("SexualOrientationId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("SocialName")
                         .IsRequired()
@@ -240,8 +240,8 @@ namespace ISAT.Server.Data.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
-                    b.Property<int?>("UsersTypeId")
-                        .HasColumnType("int");
+                    b.Property<Guid?>("UsersTypeId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
@@ -259,16 +259,81 @@ namespace ISAT.Server.Data.Migrations
 
                     b.HasIndex("UsersTypeId");
 
-                    b.ToTable("AspNetUsers", "ISAT");
+                    b.ToTable("AspNetUsers", "dbo");
+                });
+
+            modelBuilder.Entity("ISAT.Shared.Models.Availability", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("DayWeek")
+                        .HasColumnType("int");
+
+                    b.Property<TimeOnly>("EndTime")
+                        .HasColumnType("time");
+
+                    b.Property<bool>("Inactive")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("InactiveDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("InterviewerId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("RegisterDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<TimeOnly>("StartTime")
+                        .HasColumnType("time");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Availability", "dbo");
+                });
+
+            modelBuilder.Entity("ISAT.Shared.Models.DaysOff", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("EndDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("Inactive")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("InactiveDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("InterviewerId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("DaysOff", "dbo");
                 });
 
             modelBuilder.Entity("ISAT.Shared.Models.Gender", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -280,16 +345,144 @@ namespace ISAT.Server.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Gender", "ISAT");
+                    b.ToTable("Gender", "dbo");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("b14eaf61-3585-4f5f-bc72-bfde5c833bed"),
+                            Description = "Was not asked",
+                            Name = "Not asked"
+                        },
+                        new
+                        {
+                            Id = new Guid("5611edc3-99b3-4078-91ed-2847dc445fd8"),
+                            Description = "Asked but, not informed",
+                            Name = "Not Informed"
+                        });
                 });
 
-            modelBuilder.Entity("ISAT.Shared.Models.Interviewee", b =>
+            modelBuilder.Entity("ISAT.Shared.Models.Interview", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("AudioDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<byte[]>("AudioFile")
+                        .HasColumnType("varbinary(max)");
+
+                    b.Property<bool>("AudioStatus")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("EmailToken")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("Emailed")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("EndTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("FileName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("InterviewStatusId")
+                        .HasColumnType("int");
+
+                    b.Property<Guid?>("IntervieweeId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Notes")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Observation")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Place")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("StartTime")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("InterviewStatusId");
+
+                    b.HasIndex("IntervieweeId");
+
+                    b.ToTable("Interview", "dbo");
+                });
+
+            modelBuilder.Entity("ISAT.Shared.Models.InterviewStatus", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("Inactive")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("InterviewStatus", "dbo");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Description = "New",
+                            Inactive = false,
+                            Status = "New"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Description = "Waiting Confirmation - Email Sent",
+                            Inactive = false,
+                            Status = "Waiting Confirmation"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Description = "Confirmed",
+                            Inactive = false,
+                            Status = "Confirmed"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Description = "Canceled",
+                            Inactive = false,
+                            Status = "Canceled"
+                        });
+                });
+
+            modelBuilder.Entity("ISAT.Shared.Models.Interviewee", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -299,8 +492,8 @@ namespace ISAT.Server.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("GenderId")
-                        .HasColumnType("int");
+                    b.Property<Guid?>("GenderId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<bool>("Inactive")
                         .HasColumnType("bit");
@@ -309,12 +502,16 @@ namespace ISAT.Server.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Observation")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("PhoneNumber")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("SexualOrientationId")
-                        .HasColumnType("int");
+                    b.Property<Guid?>("SexualOrientationId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("SocialName")
                         .IsRequired()
@@ -322,20 +519,62 @@ namespace ISAT.Server.Data.Migrations
 
                     b.HasKey("Id");
 
+                    b.ToTable("Interviewee", "dbo");
+                });
+
+            modelBuilder.Entity("ISAT.Shared.Models.Interviewer", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid?>("GenderId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("Inactive")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid?>("SexualOrientationId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("SocialName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid?>("UsersTypeId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
                     b.HasIndex("GenderId");
 
                     b.HasIndex("SexualOrientationId");
 
-                    b.ToTable("Interviewee", "ISAT");
+                    b.HasIndex("UsersTypeId");
+
+                    b.ToTable("Interviewers", "dbo");
                 });
 
             modelBuilder.Entity("ISAT.Shared.Models.SexualOrientation", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -347,16 +586,28 @@ namespace ISAT.Server.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("SexualOrientation", "ISAT");
+                    b.ToTable("SexualOrientation", "dbo");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("04edb354-c321-49b9-b303-b2abddf5be0f"),
+                            Description = "Was not asked",
+                            Name = "Not asked"
+                        },
+                        new
+                        {
+                            Id = new Guid("b01e2e3a-1683-4fdb-a65e-9342b7b9bc02"),
+                            Description = "Asked but, not informed",
+                            Name = "Not Informed"
+                        });
                 });
 
             modelBuilder.Entity("ISAT.Shared.Models.UsersType", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<bool>("Deletable")
                         .HasColumnType("bit");
@@ -371,7 +622,30 @@ namespace ISAT.Server.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("UsersType", "ISAT");
+                    b.ToTable("UsersType", "dbo");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("37088b96-19ea-4eb3-9544-a876479d8d8b"),
+                            Deletable = false,
+                            Description = "Administrative Users",
+                            Name = "Administrative"
+                        },
+                        new
+                        {
+                            Id = new Guid("1f457829-e752-4ab7-8e49-5232a3904474"),
+                            Deletable = false,
+                            Description = "Interviewer Users",
+                            Name = "Interviewer"
+                        },
+                        new
+                        {
+                            Id = new Guid("d4b6fd3a-9df3-40e6-ac8e-2ae6b92b6542"),
+                            Deletable = false,
+                            Description = "Researcher Users",
+                            Name = "Researcher"
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -398,26 +672,7 @@ namespace ISAT.Server.Data.Migrations
                         .HasDatabaseName("RoleNameIndex")
                         .HasFilter("[NormalizedName] IS NOT NULL");
 
-                    b.ToTable("AspNetRoles", "ISAT");
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole<string>", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("ConcurrencyStamp")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("NormalizedName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Role", "ISAT");
+                    b.ToTable("Roles", "dbo");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -442,10 +697,10 @@ namespace ISAT.Server.Data.Migrations
 
                     b.HasIndex("RoleId");
 
-                    b.ToTable("RoleClaim", "ISAT");
+                    b.ToTable("RoleClaims", "dbo");
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUser<string>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUser", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
@@ -494,7 +749,7 @@ namespace ISAT.Server.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("User", "ISAT");
+                    b.ToTable("User", "dbo");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
@@ -519,7 +774,7 @@ namespace ISAT.Server.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("UserClaim", "ISAT");
+                    b.ToTable("UserClaims", "dbo");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
@@ -543,7 +798,7 @@ namespace ISAT.Server.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("UserLogin", "ISAT");
+                    b.ToTable("UserLogins", "dbo");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
@@ -558,7 +813,7 @@ namespace ISAT.Server.Data.Migrations
 
                     b.HasIndex("RoleId");
 
-                    b.ToTable("UserRole", "ISAT");
+                    b.ToTable("UserRoles", "dbo");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
@@ -579,7 +834,7 @@ namespace ISAT.Server.Data.Migrations
 
                     b.HasKey("UserId", "LoginProvider", "Name");
 
-                    b.ToTable("UserToken", "ISAT");
+                    b.ToTable("UserTokens", "dbo");
                 });
 
             modelBuilder.Entity("ISAT.Server.Models.ApplicationUser", b =>
@@ -603,7 +858,22 @@ namespace ISAT.Server.Data.Migrations
                     b.Navigation("UsersType");
                 });
 
-            modelBuilder.Entity("ISAT.Shared.Models.Interviewee", b =>
+            modelBuilder.Entity("ISAT.Shared.Models.Interview", b =>
+                {
+                    b.HasOne("ISAT.Shared.Models.InterviewStatus", "InterviewStatus")
+                        .WithMany()
+                        .HasForeignKey("InterviewStatusId");
+
+                    b.HasOne("ISAT.Shared.Models.Interviewee", "Interviewee")
+                        .WithMany()
+                        .HasForeignKey("IntervieweeId");
+
+                    b.Navigation("InterviewStatus");
+
+                    b.Navigation("Interviewee");
+                });
+
+            modelBuilder.Entity("ISAT.Shared.Models.Interviewer", b =>
                 {
                     b.HasOne("ISAT.Shared.Models.Gender", "Gender")
                         .WithMany()
@@ -613,9 +883,15 @@ namespace ISAT.Server.Data.Migrations
                         .WithMany()
                         .HasForeignKey("SexualOrientationId");
 
+                    b.HasOne("ISAT.Shared.Models.UsersType", "UsersType")
+                        .WithMany()
+                        .HasForeignKey("UsersTypeId");
+
                     b.Navigation("Gender");
 
                     b.Navigation("SexualOrientation");
+
+                    b.Navigation("UsersType");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

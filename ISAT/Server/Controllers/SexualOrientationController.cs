@@ -1,11 +1,13 @@
 ﻿using ISAT.Server.Data;
 using ISAT.Shared.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace ISAT.Server.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class SexualOrientationController : ControllerBase
@@ -26,7 +28,7 @@ namespace ISAT.Server.Controllers
 
         // GET: api/SexualOrientation/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<SexualOrientation>> GetSexualOrientation(int id)
+        public async Task<ActionResult<SexualOrientation>> GetSexualOrientation(Guid id)
         {
             var sexualOrientation = await _context.SexualOrientations.FindAsync(id);
 
@@ -51,7 +53,7 @@ namespace ISAT.Server.Controllers
 
         // PUT: api/SexualOrientation/5        
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutSexualOrientation(int id, SexualOrientation sexualOrientation)
+        public async Task<IActionResult> PutSexualOrientation(Guid id, SexualOrientation sexualOrientation)
         {
             if (id != sexualOrientation.Id)
             {
@@ -81,7 +83,7 @@ namespace ISAT.Server.Controllers
 
         // DELETE: api/SexualOrientation/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteSexualOrientation(int id)
+        public async Task<IActionResult> DeleteSexualOrientation(Guid id)
         {
             var sexualOrientation = await _context.SexualOrientations.FindAsync(id);
             if (sexualOrientation == null)
@@ -95,7 +97,7 @@ namespace ISAT.Server.Controllers
             return NoContent();
         }
 
-        private bool SexualOrientationExists(int id)
+        private bool SexualOrientationExists(Guid id)
         {
             return _context.SexualOrientations.Any(e => e.Id == id);
         }

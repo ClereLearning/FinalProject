@@ -9,15 +9,18 @@
 @attribute [Authorize]
 
 <PageTitle> Audio Managment </PageTitle>
-
-<h3>Audio Managment</h3>
+<AuthorizeView>
+    <Authorized>
+        <h3>Audio Managment @context.User.Identity!.Name </h3>
+    </Authorized>
+</AuthorizeView>
 <br />
 <hr />
 <div class="row">
     <div class="col-md-6">
         <a href='/interviewaddedit' class="btn btn-primary" role="button">
             <i class="oi oi-plus"></i>
-            List of Interviews and Audio Managment
+            Upload
         </a>
     </div>
 </div>
@@ -46,11 +49,14 @@
 else
 {
     <QuickGrid Items="interviewList.AsQueryable()" Pagination="pagination">
-        <PropertyColumn Property="i => i.Place" Title="Place" Sortable="true" />
-        <PropertyColumn Property="i=> i.Date" Title="Date" Sortable="true" />
-        <PropertyColumn Property="i=> i.Hour" Title="Hour" Sortable="true" />
+        <PropertyColumn Property="i=> i.Interviewee.SocialName" Title="Social Name" Sortable="true" />
+        <PropertyColumn Property="i=> i.Interviewee.FirstName" Title="First Name" Sortable="true" />
+        <!--<PropertyColumn Property="i=> i.Date" Title="Interview Date" Sortable="true" />-->
+        <PropertyColumn Property="i => i.Place" Title="Place" Sortable="true" />        
+        <!--
         <PropertyColumn Property="i=> i.AudioDate" Title="Audio Upload Date" Sortable="true" />
-        <PropertyColumn Property="i=> i.AudioStatus" Title="Audio Status" Sortable="true" />        
+        <PropertyColumn Property="i=> i.AudioStatus" Title="Audio Status" Sortable="true" />
+        -->
         <TemplateColumn>
             <button class="btn btn-primary" onclick="@(() => EditIt(context))"><i class="oi oi-pencil" /></button>
             <button class="btn btn-primary" onclick="@(() => DeleteIt(context))"><i class="oi oi-trash" /></button>
@@ -116,7 +122,7 @@ else
     public async void DeleteIt(Interview i)
     {
         Searching = "";
-        if (i.Id != 0)
+        @if (!(i.Id == Guid.Empty))
         {
             await InterviewService.DeleteInterview(i.Id);
         }

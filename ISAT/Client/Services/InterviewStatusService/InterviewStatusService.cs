@@ -1,17 +1,35 @@
-﻿namespace ISAT.Client.Services.InterviewStatusService
+﻿using System.Net.Http.Json;
+
+namespace ISAT.Client.Services.InterviewStatusService
 {
     public class InterviewStatusService : IInterviewStatusService
     {
-        public List<InterviewStatus> InterviewsStatus { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        private readonly HttpClient _httpClient;
 
-        public Task<List<InterviewStatus>> GetInterviewsStatus()
+        public InterviewStatusService(HttpClient http)
         {
-            throw new NotImplementedException();
+            this._httpClient = http;
+        }
+        public List<InterviewStatus> InterviewsStatus { get; set; } = new List<InterviewStatus>();
+
+        public async Task<List<InterviewStatus>> GetInterviewsStatus()
+        {
+            var result = await _httpClient.GetFromJsonAsync<List<InterviewStatus>>("api/interviewstatus");
+            if (result != null)
+            {
+                return result;
+            }
+            throw new Exception("Interview Status empty");
         }
 
-        public Task<InterviewStatus> GetInterviewStatus(int id)
+        public async Task<InterviewStatus> GetInterviewStatus(int id)
         {
-            throw new NotImplementedException();
+            var result = await _httpClient.GetFromJsonAsync<InterviewStatus>($"api/interviewstatus/{id}");
+            if (result != null)
+            {
+                return result;
+            }
+            throw new Exception("Interview Status not found!");
         }
     }
 }

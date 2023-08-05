@@ -4,9 +4,9 @@
     {
         public List<SexualOrientation> SexualOrientations { get; set; }
         public Task<List<SexualOrientation>> GetSexualOrientations();
-        public Task<SexualOrientation> GetSexualOrientation(int id);
-        public Task PutSexualOrientation(int id, SexualOrientation sexualOrientation);
+        public Task<SexualOrientation> GetSexualOrientation(Guid id);
+        public Task PutSexualOrientation(Guid id, SexualOrientation sexualOrientation);
         public Task<SexualOrientation> PostSexualOrientation(SexualOrientation sexualOrientation);
-        public Task DeleteSexualOrientation(int id);
+        public Task DeleteSexualOrientation(Guid id);
     }
 }

@@ -1,5 +1,5 @@
 ﻿@page "/genderaddedit"
-@page "/genderaddedit/{Id:int}"
+@page "/genderaddedit/{Id:guid}"
 @using ISAT.Shared.Models
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.WebAssembly.Authentication
@@ -8,7 +8,7 @@
 @inject HttpClient Http
 @attribute [Authorize]
 
-@if (Id == null)
+@if (Id == Guid.Empty)
 {
 
     <PageTitle> Adding a new Gender </PageTitle>
@@ -48,7 +48,7 @@ else
 @code {
     [Parameter]
 
-    public int? Id { get; set; }
+    public Guid Id { get; set; }
 
     Gender gender = new Gender { };
 
@@ -58,7 +58,7 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        btnLabel = Id == null ? "Save" : "Update";
+        btnLabel = !String.IsNullOrEmpty(Id.ToString()) ? "Save" : "Update";
 
         await GetGenders();
     }
@@ -71,10 +71,10 @@ else
 
     async Task HandleSubmit()
     {
-        if (gender.Id != 0)
+        @if (!(gender.Id == Guid.Empty))        
         {
             btnLabel = "Update";
-            await GenderService.PutGender((Id == null ? 0 : Id.Value), gender);
+            await GenderService.PutGender(Id, gender);
             NavigationManager.NavigateTo("/gendermanagment", true);
         }
         else
@@ -87,14 +87,14 @@ else
 
     protected override async Task OnParametersSetAsync()
     {
-        if (Id == null)
+        @if (Id == Guid.Empty)
         {
             // create a gender
 
         }
         else
         {
-            gender = await GenderService.GetGender((int)Id);
+            gender = await GenderService.GetGender(Id);
         }
     }
 

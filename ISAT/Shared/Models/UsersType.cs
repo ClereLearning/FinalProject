@@ -11,8 +11,9 @@ namespace ISAT.Shared.Models
     [Table("UsersType")]
     public class UsersType
     {
+        [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Required]
-        public int Id { get; set; }
+        public Guid Id { get; set; }
 
         [Required]
         public string Name { get; set; } = string.Empty;

@@ -11,11 +11,10 @@ namespace ISAT.Shared.Models
     [Table("InterviewStatus")]
     public class InterviewStatus
     {
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Required]
         public int Id { get; set; }
-        
+
         [Required]
         [StringLength(50)]  
         public string Status { get; set; } = string.Empty;

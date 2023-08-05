@@ -16,7 +16,7 @@ namespace ISAT.Client.Services.UsersTypeService
         }
         public List<UsersType> UsersTypes { get; set; } = new List<UsersType>();
 
-        public async Task DeleteUsersType(int id)
+        public async Task DeleteUsersType(Guid id)
         {
             var result = await _httpClient.DeleteAsync($"api/userstype/{id}");
             if (result != null)
@@ -26,7 +26,7 @@ namespace ISAT.Client.Services.UsersTypeService
             throw new Exception("Error during Users Type Deleting");
         }
 
-        public async Task<UsersType> GetUsersType(int id)
+        public async Task<UsersType> GetUsersType(Guid id)
         {
             var result = await _httpClient.GetFromJsonAsync<UsersType>($"api/userstype/{id}");
             if (result != null)
@@ -57,7 +57,7 @@ namespace ISAT.Client.Services.UsersTypeService
             throw new Exception("Error during Users Type creation");
         }
 
-        public async Task PutUsersType(int id, UsersType usersType)
+        public async Task PutUsersType(Guid id, UsersType usersType)
         {
             var result = await _httpClient.PutAsJsonAsync($"api/userstype/{id}", usersType);
             if (result != null)

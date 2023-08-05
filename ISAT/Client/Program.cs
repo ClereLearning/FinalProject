@@ -9,6 +9,7 @@ using ISAT.Client;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+using ISAT.Client.Services.InterviewerService;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
@@ -28,6 +29,7 @@ builder.Services.AddScoped<ISexualOrientationService, SexualOrientationService>(
 builder.Services.AddScoped<IIntervieweeService, IntervieweeService>();
 builder.Services.AddScoped<IInterviewService, InterviewService>();
 builder.Services.AddScoped<IInterviewStatusService, InterviewStatusService>();
+builder.Services.AddScoped<IInterviewerService, InterviewerService>();
 
 builder.Services.AddApiAuthorization();
 

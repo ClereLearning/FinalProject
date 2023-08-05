@@ -15,7 +15,7 @@ namespace ISAT.Client.Services.SexualOrientationService
         public List<SexualOrientation> SexualOrientations { get; set; } = new List<SexualOrientation>();
 
 
-        public async Task<SexualOrientation> GetSexualOrientation(int id)
+        public async Task<SexualOrientation> GetSexualOrientation(Guid id)
         {
             var result = await _httpClient.GetFromJsonAsync<SexualOrientation>($"api/SexualOrientation/{id}");
             if (result != null)
@@ -46,7 +46,7 @@ namespace ISAT.Client.Services.SexualOrientationService
             throw new Exception("Error during Sexual Orientation creation");
         }
 
-        public async Task PutSexualOrientation(int id, SexualOrientation sexualOrientation)
+        public async Task PutSexualOrientation(Guid id, SexualOrientation sexualOrientation)
         {
             var result = await _httpClient.PutAsJsonAsync($"api/SexualOrientation/{id}", sexualOrientation);
             if (result != null)
@@ -66,7 +66,7 @@ namespace ISAT.Client.Services.SexualOrientationService
             }
         }
 
-        public async Task DeleteSexualOrientation(int id)
+        public async Task DeleteSexualOrientation(Guid id)
         {
             var result = await _httpClient.DeleteAsync($"api/SexualOrientation/{id}");
             if (result != null)

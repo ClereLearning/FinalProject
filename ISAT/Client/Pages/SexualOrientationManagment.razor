@@ -115,7 +115,7 @@ else
     public async void DeleteIt(SexualOrientation s)
     {
         Searching = "";
-        if (s.Id != 0)
+        @if (!(s.Id == Guid.Empty))
         {
             await SexualOrientationService.DeleteSexualOrientation(s.Id);
         }

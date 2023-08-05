@@ -1,5 +1,5 @@
 ﻿@page "/intervieweeaddedit"
-@page "/intervieweeaddedit/{Id:int}"
+@page "/intervieweeaddedit/{Id:guid}"
 @using ISAT.Shared.Models
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.WebAssembly.Authentication
@@ -8,7 +8,8 @@
 @inject HttpClient Http
 @attribute [Authorize]
 
-@if (Id == null)
+
+@if (Id == Guid.Empty)
 {
 
     <PageTitle> Adding a new Interviewee </PageTitle>
@@ -28,7 +29,13 @@ else
 <br />
 <hr />
 <EditForm Model="@interviewee" OnValidSubmit="HandleSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
     <div class="row">
+        <div class="mb-3">
+            <label asp-for="SocialName" class="form-control">Social Name</label>
+            <InputText id="SocialName" @bind-Value="interviewee.SocialName" class="form-control" aria-required="false"></InputText>
+        </div>
         <div class="mb-3">
             <label asp-for="Name" class="form-control">First Name</label>
             <InputText id="Name" @bind-Value="interviewee.FirstName" class="form-control" aria-required="true"></InputText>
@@ -38,8 +45,23 @@ else
             <InputText id="LastName" @bind-Value="interviewee.LastName" class="form-control" aria-required="false"></InputText>
         </div>
         <div class="mb-3">
-            <label asp-for="SocialName" class="form-control">Social Name</label>
-            <InputText id="SocialName" @bind-Value="interviewee.SocialName" class="form-control" aria-required="false"></InputText>
+            <label asp-for="Gender" class="form-control">Gender</label>
+            <InputSelect @bind-Value="interviewee.Gender.Id" class="form-select">
+                @foreach (var g in genders)
+                {
+                    <option value="@g.Id">@g.Name </option>
+                }
+            </InputSelect>
+
+        </div>
+        <div class="mb-3">
+            <label asp-for="SexualOrientation" class="form-control">Sexual Orientation</label>
+            <InputSelect @bind-Value="interviewee.SexualOrientation.Id" class="form-select">
+                @foreach (var s in sexualOrientations)
+                {
+                    <option value="@s.Id">@s.Name </option>
+                }
+            </InputSelect>
         </div>
         <div class="mb-3">
             <label asp-for="Email" class="form-control">Email</label>
@@ -48,31 +70,68 @@ else
         <div class="mb-3">
             <label asp-for="PhoneNumber" class="form-control">Phone Number</label>
             <InputText id="PhoneNumber" @bind-Value="interviewee.PhoneNumber" class="form-control" aria-required="false"></InputText>
-        </div>        
+        </div>
+        <div class="mb-3">
+            <label asp-for="Observation" class="form-control">Observation</label>
+            <InputText id="Observation" @bind-Value="interviewee.Observation" class="form-control" aria-required="false"></InputText>
+        </div>
+    </div>
+    <div>
+        <div class="alert alert-primary @DisplayAlert" role="alert">
+            @DisplayContentAlert
+        </div>
     </div>
     <div class="form-group">
         <button type="submit" class="btn btn-primary">@btnLabel</button>
         <button type="button" class="btn btn-light" @onclick="Cancel">Cancel</button>
     </div>
-
 </EditForm>
 
 @code {
     [Parameter]
 
-    public int? Id { get; set; }
+    public Guid Id { get; set; }
 
-    Interviewee interviewee = new Interviewee { };
+    private string DisplayAlert { get; set; } = "d-none";
+
+    private string DisplayContentAlert { get; set; }
+
+    Interviewee interviewee = new Interviewee()
+        {
+
+            Gender = new Gender(),
+            SexualOrientation = new SexualOrientation()
+
+        };
+
 
     protected List<Interviewee> interviewees = new();
+
+    protected List<SexualOrientation> sexualOrientations = new();
+
+    protected List<Gender> genders = new();
 
     string btnLabel = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
-        btnLabel = Id == null ? "Save" : "Update";
+        btnLabel = (interviewee.Id == Guid.Empty) ? "Save" : "Update";
 
         await GetInterviewees();
+        await GetSexualOrientations();
+        await GetGenders();
+    }
+
+    protected async Task<List<SexualOrientation>> GetSexualOrientations()
+    {
+        sexualOrientations = await IntervieweeService.GetSexualOrientations();
+        return sexualOrientations;
+    }
+
+    protected async Task<List<Gender>> GetGenders()
+    {
+        genders = await IntervieweeService.GetGenders();
+        return genders;
     }
 
     protected async Task<List<Interviewee>> GetInterviewees()
@@ -83,30 +142,114 @@ else
 
     async Task HandleSubmit()
     {
-        if (interviewee.Id != 0)
+        await GetInterviewees();
+        Boolean IntevieweeExists = false;
+        DisplayAlert = "d-none";
+        DisplayContentAlert = "The Inteviewee already exists - Email or Phone Number";
+
+        if (!(interviewee.Id == Guid.Empty))
         {
-            btnLabel = "Update";
-            await IntervieweeService.PutInterviewee((Id == null ? 0 : Id.Value), interviewee);
-            NavigationManager.NavigateTo("/intervieweemanagment", true);
+
+            if (!String.IsNullOrEmpty(interviewee.Email.Trim()))
+            {
+                if (interviewees.Where(i => i.Email == interviewee.Email && i.Id!=interviewee.Id).ToList().Count() > 0)
+                {
+                    IntevieweeExists = true;
+                    DisplayContentAlert = "The Inteviewee Email already exists in our records. Someonelse has previously been informed ";
+                }
+            }
+
+            if (!IntevieweeExists)
+            {
+                if (!String.IsNullOrEmpty(interviewee.PhoneNumber.Trim()))
+                {
+                    if (interviewees.Where(i => i.PhoneNumber == interviewee.PhoneNumber && i.Id!=interviewee.Id ).ToList().Count() > 0)
+                    {
+                        IntevieweeExists = true;
+                        DisplayContentAlert = "The Inteviewee Phone Number already exists in our records. Someonelse has previously been informed ";
+                    }
+                }
+            }
+
+            if (!IntevieweeExists)
+            {
+                btnLabel = "Update";
+                await IntervieweeService.PutInterviewee(Id, interviewee);
+                NavigationManager.NavigateTo("/intervieweemanagment", true);
+            }
+            else
+            {
+                DisplayAlert = "";
+            }
         }
         else
         {
-            interviewee = await IntervieweeService.PostInterviewee(interviewee);
-            NavigationManager.NavigateTo("/intervieweemanagment", true);
+
+
+            if (!String.IsNullOrEmpty(interviewee.Email.Trim()))
+            {
+                if (interviewees.Where(i => i.Email == interviewee.Email).ToList().Count() > 0)
+                {
+                    IntevieweeExists = true;
+                    DisplayContentAlert = "The Inteviewee Email already exists in our records.";
+                }
+            }
+
+            if (!IntevieweeExists)
+            {
+                if (!String.IsNullOrEmpty(interviewee.PhoneNumber.Trim()))
+                {
+                    if (interviewees.Where(i => i.PhoneNumber == interviewee.PhoneNumber).ToList().Count() > 0)
+                    {
+                        IntevieweeExists = true;
+                        DisplayContentAlert = "The Inteviewee Phone Number already exists in our records.";
+                    }
+                }
+            }
+
+            if (!IntevieweeExists)
+            {
+                interviewee = await IntervieweeService.PostInterviewee(interviewee);
+                NavigationManager.NavigateTo("/intervieweemanagment", true);
+            }
+            else
+            {
+                DisplayAlert = "";
+            }
         }
 
     }
 
     protected override async Task OnParametersSetAsync()
     {
-        if (Id == null)
+        if (Id == Guid.Empty)
         {
             // create a interviewee
-
+            interviewee.Gender = genders.Where(x => x.Name.IndexOf("Not asked", StringComparison.OrdinalIgnoreCase) != -1).FirstOrDefault();
+            interviewee.SexualOrientation = sexualOrientations.Where(x => x.Name.IndexOf("Not asked", StringComparison.OrdinalIgnoreCase) != -1).FirstOrDefault();
         }
         else
         {
-            interviewee = await IntervieweeService.GetInterviewee((int)Id);
+            interviewee = await IntervieweeService.GetInterviewee(Id);
+            if (!(interviewee.GenderId == Guid.Empty))
+            {
+                interviewee.Gender = genders.Where(x => x.Id == interviewee.GenderId).FirstOrDefault();
+            }
+            else
+            {
+                interviewee.Gender = genders.Where(x => x.Name.IndexOf("Not asked", StringComparison.OrdinalIgnoreCase) != -1).FirstOrDefault();
+            }
+
+            if (!(interviewee.SexualOrientationId == Guid.Empty))
+            {
+                interviewee.SexualOrientation = sexualOrientations.Where(x => x.Id == interviewee.SexualOrientationId).FirstOrDefault();
+            }
+            else
+            {
+                interviewee.SexualOrientation = sexualOrientations.Where(x => x.Name.IndexOf("Not asked", StringComparison.OrdinalIgnoreCase) != -1).FirstOrDefault();
+            }
+
+
         }
     }
 

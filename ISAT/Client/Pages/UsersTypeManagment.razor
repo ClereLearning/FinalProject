@@ -108,17 +108,17 @@ else
         usersTypeList = searchUsersTypeList;
     }
 
-    public void EditIt(UsersType g)
+    public void EditIt(UsersType u)
     {
-        NavigationManager.NavigateTo($"userstypeaddedit/{g.Id}");
+        NavigationManager.NavigateTo($"userstypeaddedit/{u.Id}");
     }
 
-    public async void DeleteIt(UsersType g)
+    public async void DeleteIt(UsersType u)
     {
         Searching = "";
-        if (g.Id != 0)
+        @if (!(u.Id == Guid.Empty))
         {
-            await UsersTypeService.DeleteUsersType(g.Id);
+            await UsersTypeService.DeleteUsersType(u.Id);
         }
         Cancel();
 

@@ -20,7 +20,7 @@ namespace ISAT.Client.Services.GenderService
 
        
 
-        public async Task<Gender> GetGender(int id)
+        public async Task<Gender> GetGender(Guid id)
         {
             var result = await _httpClient.GetFromJsonAsync<Gender>($"api/gender/{id}");            
             if (result != null)
@@ -51,7 +51,7 @@ namespace ISAT.Client.Services.GenderService
             throw new Exception("Error during Gender creation");
         }
 
-        public async Task PutGender(int id, Gender gender)
+        public async Task PutGender(Guid id, Gender gender)
         {
             var result = await _httpClient.PutAsJsonAsync($"api/gender/{id}", gender);
             if (result != null)
@@ -71,7 +71,7 @@ namespace ISAT.Client.Services.GenderService
             }
         }
 
-        public async Task DeleteGender(int id)
+        public async Task DeleteGender(Guid id)
         {
             var result = await _httpClient.DeleteAsync($"api/gender/{id}");            
             if (result != null)
@@ -80,6 +80,7 @@ namespace ISAT.Client.Services.GenderService
             }
             throw new Exception("Error during Gender Deleting");
         }
+
 
     }
 }

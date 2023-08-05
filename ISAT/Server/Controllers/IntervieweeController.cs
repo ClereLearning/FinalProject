@@ -23,44 +23,45 @@ namespace ISAT.Server.Controllers
 
         // GET: api/Interviewee
         [HttpGet]
-        public async Task<ActionResult<List<Interviewee>>> GetInterviewees()
+        public async Task<ActionResult<IEnumerable<Interviewee>>> GetInterviewees()
         {
             return await _context.Interviewees.ToListAsync();
         }
 
         // GET: api/Interviewee/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Interviewee>> GetInterviewee(int id)
+        public async Task<ActionResult<Interviewee>> GetInterviewee(Guid id)
         {
             var interviewee = await _context.Interviewees.FindAsync(id);
+            /*
+             * var interviewee = await _context.Interviewees
+                .Include(g => g.Gender)
+                .Include(s => s.SexualOrientation)
+                .FirstOrDefaultAsync(i => i.Id == id);
+            */
+
 
             if (interviewee == null)
             {
                 return NotFound();
             }
 
-            return Ok( (Interviewee) interviewee);
+            return interviewee;
         }
 
-       
-        // POST: api/Interviewee        
-        [HttpPost]
-        public async Task<ActionResult<Interviewee>> PostInterviewee(Interviewee interviewee)
-        {
-            _context.Interviewees.Add(interviewee);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetInterviewee", new { id = interviewee.Id }, interviewee);
-        }
-
-        // PUT: api/Interviewee/5        
+        // PUT: api/Interviewee/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutInterviewee(int id, Interviewee interviewee)
+        public async Task<IActionResult> PutInterviewee(Guid id, Interviewee interviewee)
         {
             if (id != interviewee.Id)
             {
                 return BadRequest();
             }
+
+            interviewee.GenderId = interviewee.Gender.Id;
+            interviewee.Gender = null;
+            interviewee.SexualOrientationId = interviewee.SexualOrientation.Id;
+            interviewee.SexualOrientation = null;
 
             _context.Entry(interviewee).State = EntityState.Modified;
 
@@ -83,9 +84,23 @@ namespace ISAT.Server.Controllers
             return NoContent();
         }
 
+        // POST: api/Interviewee
+        [HttpPost]
+        public async Task<ActionResult<Interviewee>> PostInterviewee(Interviewee interviewee)
+        {
+            interviewee.GenderId = interviewee.Gender.Id;
+            interviewee.Gender = null;
+            interviewee.SexualOrientationId = interviewee.SexualOrientation.Id;
+            interviewee.SexualOrientation = null;
+            _context.Interviewees.Add(interviewee);
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction("GetInterviewee", new { id = interviewee.Id }, interviewee);
+        }
+
         // DELETE: api/Interviewee/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteInterviewee(int id)
+        public async Task<IActionResult> DeleteInterviewee(Guid id)
         {
             var interviewee = await _context.Interviewees.FindAsync(id);
             if (interviewee == null)
@@ -99,9 +114,30 @@ namespace ISAT.Server.Controllers
             return NoContent();
         }
 
-        private bool IntervieweeExists(int id)
+        private bool IntervieweeExists(Guid id)
         {
             return _context.Interviewees.Any(e => e.Id == id);
+        }
+
+        // GET: api/Interview/sexualorientation
+        [HttpGet("sexualorientation")]
+        public async Task<ActionResult<IEnumerable<SexualOrientation>>> GetSexualOrientations()
+        {
+            return await _context.SexualOrientations.ToListAsync();
+        }
+
+        // GET: api/Interview/gender
+        [HttpGet("gender")]
+        public async Task<ActionResult<IEnumerable<Gender>>> GetGenders()
+        {
+            return await _context.Genders.ToListAsync();
+        }
+
+        // GET: api/Interviewee/email@email.com
+        [HttpGet("{email}/{PhoneNumber}")]
+        public async Task<ActionResult<IEnumerable<Interviewee>>> GetInterviewees(string email, string PhoneNumber)
+        {
+            return await _context.Interviewees.Where(i => i.Email == email || i.PhoneNumber == PhoneNumber).ToListAsync();          
         }
     }
 }

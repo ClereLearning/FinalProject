@@ -1,5 +1,5 @@
 ﻿@page "/sexualOrientationaddedit"
-@page "/sexualorientationaddedit/{Id:int}"
+@page "/sexualorientationaddedit/{Id:guid}"
 @using ISAT.Shared.Models
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.WebAssembly.Authentication
@@ -8,7 +8,7 @@
 @inject HttpClient Http
 @attribute [Authorize]
 
-@if (Id == null)
+@if (Id == Guid.Empty)
 {
 
     <PageTitle> Adding a new Sexual Orientation </PageTitle>
@@ -48,7 +48,7 @@ else
 @code {
     [Parameter]
 
-    public int? Id { get; set; }
+    public Guid Id { get; set; }
 
     SexualOrientation sexualOrientation = new SexualOrientation { };
 
@@ -58,7 +58,7 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        btnLabel = Id == null ? "Save" : "Update";
+        btnLabel = !String.IsNullOrEmpty(Id.ToString()) ? "Save" : "Update";
 
         await GetSexualOrientations();
     }
@@ -70,11 +70,11 @@ else
     }
 
     async Task HandleSubmit()
-    {
-        if (sexualOrientation.Id != 0)
+    {        
+        @if (!(sexualOrientation.Id == Guid.Empty))
         {
             btnLabel = "Update";
-            await SexualOrientationService.PutSexualOrientation((Id == null ? 0 : Id.Value), sexualOrientation);
+            await SexualOrientationService.PutSexualOrientation(Id, sexualOrientation);
             NavigationManager.NavigateTo("/sexualOrientationmanagment", true);
         }
         else
@@ -87,14 +87,14 @@ else
 
     protected override async Task OnParametersSetAsync()
     {
-        if (Id == null)
+        @if (Id == Guid.Empty)
         {
             // create a sexualOrientation
 
         }
         else
         {
-            sexualOrientation = await SexualOrientationService.GetSexualOrientation((int)Id);
+            sexualOrientation = await SexualOrientationService.GetSexualOrientation(Id);
         }
     }
 

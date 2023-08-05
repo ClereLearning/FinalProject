@@ -7,9 +7,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ISAT.Server.Data;
 using ISAT.Shared.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ISAT.Server.Controllers
 {
+    
     [Route("api/[controller]")]
     [ApiController]
     public class UsersTypeController : ControllerBase
@@ -30,7 +32,7 @@ namespace ISAT.Server.Controllers
 
         // GET: api/userstype/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<UsersType>> GetUsersType(int id)
+        public async Task<ActionResult<UsersType>> GetUsersType(Guid id)
         {
             var usersType = await _context.UsersTypes.FindAsync(id);
 
@@ -55,7 +57,7 @@ namespace ISAT.Server.Controllers
 
         // PUT: api/userstype/5        
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutUsersType(int id, UsersType usersType)
+        public async Task<IActionResult> PutUsersType(Guid id, UsersType usersType)
         {
             if (id != usersType.Id)
             {
@@ -85,7 +87,7 @@ namespace ISAT.Server.Controllers
 
         // DELETE: api/userstype/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteUsersType(int id)
+        public async Task<IActionResult> DeleteUsersType(Guid id)
         {
             var UsersType = await _context.UsersTypes.FindAsync(id);
             if (UsersType == null)
@@ -99,7 +101,7 @@ namespace ISAT.Server.Controllers
             return NoContent();
         }
 
-        private bool UserTypeExists(int id)
+        private bool UserTypeExists(Guid id)
         {
             return _context.UsersTypes.Any(e => e.Id == id);
         }

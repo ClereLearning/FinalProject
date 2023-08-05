@@ -12,28 +12,39 @@ namespace ISAT.Shared.Models
     [Table("Interview")]
     public class Interview
     {
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        
+        [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Required]
-        public int Id { get; set; }
+        public Guid Id { get; set; }
 
         [Required]
         public string Place { get; set; } = string.Empty;
 
+
         [Required]
         public DateTime Date { get; set; }
 
-        [Required]
-        public DateTime Hour { get; set; }
+        [Required]        
+        [Display(Name = "Start time")]
+        public DateTime StartTime { get; set; }
 
-        [Required]
+        [Required]        
+        [Display(Name = "End time")]
+        public DateTime EndTime { get; set; }
+
+
+        [Display(Name = "Interviewee")]
         [ForeignKey("IntervieweeId")]
-        public virtual required Interviewee Interviewee { get; set; }
+        public virtual Interviewee? Interviewee { get; set; }
 
-        [Required]
+        
+        public Guid? IntervieweeId { get; set; }
+
+
+        [Display(Name = "Status")]
         [ForeignKey("InterviewStatusId")]
-        public virtual required InterviewStatus InterviewStatus { get; set; }
+        public virtual InterviewStatus? InterviewStatus { get; set; }                        
+        
+        public int? InterviewStatusId { get; set; }
 
         [Required]
         public bool Emailed { get; set; } = false;
@@ -42,11 +53,17 @@ namespace ISAT.Shared.Models
 
         public byte[]? AudioFile { get; set; }
 
-        public DateTime AudioDate { get; set; }
+        public DateTime? AudioDate { get; set; }
 
         public bool AudioStatus { get; set; } = false;
 
         public string FileName { get; set; } = string.Empty;
+
+        [Display(Name = "Observation")]
+        public string Observation { get; set; } = string.Empty;
+
+        [Display(Name = "Notes")]
+        public string Notes { get; set; } = string.Empty;
 
     }
 }

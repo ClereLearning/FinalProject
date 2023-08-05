@@ -46,12 +46,20 @@
 else
 {
     <QuickGrid Items="interviewList.AsQueryable()" Pagination="pagination">
+        <PropertyColumn Property="i=> i.Interviewee.SocialName" Title="Social Name" Sortable="true" />
         <PropertyColumn Property="i => i.Place" Title="Place" Sortable="true" />
-        <PropertyColumn Property="i=> i.Date" Title="Date" Sortable="true" />
-        <PropertyColumn Property="i=> i.Hour" Title="Hour" Sortable="true" />
+        <PropertyColumn Property="i=> i.Date" Title="Date" Format="dd/MM/yyyy" Sortable="true" />
+        <PropertyColumn Property="i=> i.StartTime" Title="Start Time" Format="HH:mm" Sortable="true" />
+        <PropertyColumn Property="i=> i.EndTime" Title="End Time" Format="HH:mm" Sortable="true" />
+        <PropertyColumn Property="i=> i.Observation" Title="Observation" Sortable="true" />
+        <PropertyColumn Property="i => i.InterviewStatus.Status" Title="Status" Sortable="true" />
         <TemplateColumn>
-            <button class="btn btn-primary" onclick="@(() => EditIt(context))"><i class="oi oi-pencil" /></button>
-            <button class="btn btn-primary" onclick="@(() => DeleteIt(context))"><i class="oi oi-trash" /></button>
+            @if (context.InterviewStatusId < 5)
+            {
+                <button class="btn btn-primary" onclick="@(() => EditIt(context))"><i class="oi oi-pencil" /></button>
+
+                <button class="btn btn-primary" onclick="@(() => DeleteIt(context))"><i class="oi oi-trash" /></button>
+            }
         </TemplateColumn>
     </QuickGrid>
     <Paginator State="@pagination" />
@@ -69,11 +77,14 @@ else
 
     PaginationState pagination = new PaginationState { ItemsPerPage = 20 };
 
+    
+
     protected void SearchFor()
     {
         if (!string.IsNullOrEmpty(Searching))
         {
             interviewList = searchInterviewList.Where(x => x.Interviewee.FirstName.IndexOf(Searching, StringComparison.OrdinalIgnoreCase) != -1)
+            .OrderBy(x => x.StartTime)
             .ToList();
         }
         else
@@ -83,7 +94,7 @@ else
     }
 
     protected override async Task OnInitializedAsync()
-    {
+    {        
         await GetInterviews();
         SearchFor();
     }
@@ -91,6 +102,7 @@ else
     protected async Task GetInterviews()
     {
         interviewList = await InterviewService.GetInterviews();
+        interviewList = interviewList.OrderBy(x => x.StartTime).ToList();
         searchInterviewList = interviewList;
     }
 
@@ -114,7 +126,7 @@ else
     public async void DeleteIt(Interview i)
     {
         Searching = "";
-        if (i.Id != 0)
+        @if (!(i.Id == Guid.Empty))
         {
             await InterviewService.DeleteInterview(i.Id);
         }
