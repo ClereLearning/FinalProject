@@ -26,16 +26,14 @@
 <div class="row">
     <br />
     <div class="mb-3">
-        <label asp-for="Searching" class="form-control">Search Interview</label>
+        <label asp-for="Searching" class="form-control">Search Interview 
+            @if (Searching.Length > 0)
+            {
+                <button class="btn btn-light" @onclick="SearchingReset"><i class="bi bi-arrow-counterclockwise" data-toggle="tooltip" title="Reset Search" /> </button>
+            }
+        </label>
         <InputText id="Searching" @bind-Value="Searching" class="form-control" aria-required="true" @onkeypress="SearchFor" @onkeydown="SearchFor" @onkeyup="SearchFor"></InputText>
     </div>
-    @if (Searching.Length > 0)
-    {
-        <div>
-            <button class="btn btn-danger" @onclick="SearchingReset"><i class="io oi-delete" /> </button>
-        </div>
-    }
-
 </div>
 <hr />
 <br />
@@ -56,9 +54,9 @@ else
         <TemplateColumn>
             @if (context.InterviewStatusId < 5)
             {
-                <button class="btn btn-primary" onclick="@(() => EditIt(context))"><i class="oi oi-pencil" /></button>
+                <button class="btn btn-primary" onclick="@(() => EditIt(context))" data-toggle="tooltip" title="Edit"><i class="oi oi-pencil" /></button>
 
-                <button class="btn btn-primary" onclick="@(() => DeleteIt(context))"><i class="oi oi-trash" /></button>
+                <button class="btn btn-primary" onclick="@(() => DeleteIt(context))" data-toggle="tooltip" title="Delete"><i class="oi oi-trash" /></button>
             }
         </TemplateColumn>
     </QuickGrid>
@@ -83,7 +81,7 @@ else
     {
         if (!string.IsNullOrEmpty(Searching))
         {
-            interviewList = searchInterviewList.Where(x => x.Interviewee.FirstName.IndexOf(Searching, StringComparison.OrdinalIgnoreCase) != -1)
+            interviewList = searchInterviewList.Where(x => x.Interviewee.SocialName.IndexOf(Searching, StringComparison.OrdinalIgnoreCase) != -1)
             .OrderBy(x => x.StartTime)
             .ToList();
         }

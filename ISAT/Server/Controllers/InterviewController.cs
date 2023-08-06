@@ -35,6 +35,7 @@ namespace ISAT.Server.Controllers
                 .ToListAsync();
         }
 
+
         // GET: api/Interview/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Interview>> GetInterview(Guid id)
@@ -121,6 +122,16 @@ namespace ISAT.Server.Controllers
         public async Task<ActionResult<List<Interviewee>>> GetInterviewees()
         {
             return await _context.Interviewees.ToListAsync();
+        }
+
+        // GET: api/Audios
+        [HttpGet("audios")]
+        public async Task<ActionResult<IEnumerable<Interview>>> GetAudioInterviews()
+        {            
+            return await _context.Interviews.Where(a=> (a.InterviewStatusId==3) || (a.InterviewStatusId == 4) || (a.InterviewStatusId == 7) || (a.InterviewStatusId == 9))
+                .Include("Interviewee")
+                .Include("InterviewStatus")
+                .ToListAsync();
         }
 
         // DELETE: api/Interview/updatestatus

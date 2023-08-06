@@ -89,5 +89,15 @@ namespace ISAT.Client.Services.InterviewService
             throw new Exception("Error during Interview UpdateStatus");
 
         }
+
+        public async Task<List<Interview>> GetGetAudioInterviews()
+        {
+            var result = await _httpClient.GetFromJsonAsync<List<Interview>>("api/interview/audios");
+            if (result != null)
+            {
+                return result;
+            }
+            throw new Exception("Interview empty");
+        }
     }
 }

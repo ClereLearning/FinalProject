@@ -4,6 +4,7 @@
 @using Microsoft.AspNetCore.Components.WebAssembly.Authentication
 @using Microsoft.AspNetCore.Components.QuickGrid
 @inject IIntervieweeService IntervieweeService
+@inject IInterviewService InterviewService
 @inject NavigationManager NavigationManager
 @inject HttpClient Http
 @attribute [Authorize]
@@ -26,16 +27,14 @@
 <div class="row">
     <br />
     <div class="mb-3">
-        <label asp-for="Searching" class="form-control">Search Interviewee</label>
+        <label asp-for="Searching" class="form-control">Search Interviewee 
+            @if (Searching.Length > 0)
+            {
+                <button class="btn btn-light" @onclick="SearchingReset"><i class="bi bi-arrow-counterclockwise" data-toggle="tooltip" title="Reset Search" /> </button>
+            }
+        </label>
         <InputText id="Searching" @bind-Value="Searching" class="form-control" aria-required="true" @onkeypress="SearchFor" @onkeydown="SearchFor" @onkeyup="SearchFor"></InputText>
-    </div>
-    @if (Searching.Length > 0)
-    {
-        <div>
-            <button class="btn btn-danger" @onclick="SearchingReset"><i class="io oi-delete" /> </button>
-        </div>
-    }
-
+    </div>    
 </div>
 <h3>List of Interviewees</h3>
 <hr />
@@ -52,14 +51,19 @@ else
         <PropertyColumn Property="i=> i.LastName" Title="Last Name" Sortable="true" />        
         <PropertyColumn Property="i=> i.Email" Title="E-mail" Sortable="true" />
         <PropertyColumn Property="i=> i.PhoneNumber" Title="Phone number" Sortable="true" />
+            <!--
         <PropertyColumn Property="i=> i.Inactive" Title="Inactive" Sortable="true" />
+            -->
         <TemplateColumn>
-            <button class="btn btn-primary" onclick="@(() => EditIt(context))"><i class="oi oi-pencil" /></button>
-            <button class="btn btn-primary" onclick="@(() => DeleteIt(context))"><i class="oi oi-trash" /></button>
+            <button class="btn btn-primary" onclick="@(() => EditIt(context))" data-toggle="tooltip" title="Edit"><i class="oi oi-pencil" /></button>
+
+            @if (interviews.Where(x => x.IntervieweeId == context.Id).ToList().Count() < 1)
+            {
+                <button class="btn btn-primary" onclick="@(() => DeleteIt(context))" data-toggle="tooltip" title="Delete"><i class="oi oi-trash" /></button>
+            }
         </TemplateColumn>
     </QuickGrid>
     <Paginator State="@pagination" />
-
 }
 
 @code {
@@ -71,13 +75,15 @@ else
 
     protected List<Interviewee> searchIntervieweeList = new();
 
+    protected List<Interview> interviews = new();
+
     PaginationState pagination = new PaginationState { ItemsPerPage = 20 };
 
     protected void SearchFor()
     {
         if (!string.IsNullOrEmpty(Searching))
         {
-            intervieweeList = searchIntervieweeList.Where(x => x.FirstName.IndexOf(Searching, StringComparison.OrdinalIgnoreCase) != -1)
+            intervieweeList = searchIntervieweeList.Where(x => x.SocialName.IndexOf(Searching, StringComparison.OrdinalIgnoreCase) != -1)
             .ToList();
         }
         else
@@ -89,6 +95,7 @@ else
     protected override async Task OnInitializedAsync()
     {
         await GetInterviewees();
+        interviews = await InterviewService.GetInterviews();
         SearchFor();
     }
 

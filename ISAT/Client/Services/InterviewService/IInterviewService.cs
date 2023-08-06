@@ -13,5 +13,6 @@ namespace ISAT.Client.Services.InterviewService
         public Task<Interview> PostInterview(Interview interview);
         public Task DeleteInterview(Guid id);
         public Task UpdateStatus(Guid id, int statusId);
+        public Task<List<Interview>> GetGetAudioInterviews();
     }
 }

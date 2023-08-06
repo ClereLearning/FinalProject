@@ -14,37 +14,26 @@
 <br />
 <hr />
 <div class="row">
-    <div class="col-md-6">
-        <a href='/interviewaddedit' class="btn btn-primary" role="button">
-            <i class="oi oi-plus"></i>
-            List of Interviews
-        </a>
-    </div>
-</div>
-<br />
-<hr />
-<div class="row">
     <br />
-    <div class="mb-3">
+    <div class="mb-3">        
         <label asp-for="Searching" class="form-control">
-            Search Interview by
-        </label>
-        <input type="radio" id="InterviewDate" name="SearchingBy" @bind="SearchingByDate">
-        <label for="InterviewDate">Date</label>
-        <InputDate id="SearchingDate" @bind-Value="SearchingDate" Type="InputDateType.Date" class="form-control" aria-required="true" @onblur="@(x => SearchFor())" @onkeypress="SearchFor" @onkeydown="SearchFor" @onkeyup="SearchFor"></InputDate>
-        <input type="radio" id="socialName" name="SearchingBy" @bind="SearchingBySocialName">
-        <label for="SocialName">Social Name</label>
-        <InputText id="Searching" @bind-Value="Searching" class="form-control" aria-required="true" @onkeypress="SearchFor" @onkeydown="SearchFor" @onkeyup="SearchFor"></InputText>
-        <div class="form-group">
-            <button @onclick="SearchFor" class="btn btn-primary">Search</button>
-        </div>
+            Search Interview by : 
+            @if (Searching.Length > 0)
+            {
+                <button class="btn btn-light" @onclick="SearchingReset"><i class="bi bi-arrow-counterclockwise" data-toggle="tooltip" title="Reset Search" /> </button>
+            }
+        </label>                   
+        <InputRadioGroup Name="SearchingBy" @bind-Value="@SearchingByDate">
+            <InputRadio Name="SearchingBy" Value="true"/> Date
+            <InputDate id="SearchingDate" @bind-Value="SearchingDate" Type="InputDateType.Date" class="form-control" aria-required="true" @onblur="@(x => SearchFor())" @onfocus="@(b=> SearchingByDate=true)"></InputDate>
+            <div class="form-group">
+                <button @onclick="SearchFor" class="btn btn-primary">Search</button>               
+            </div>
+            <InputRadio Name="SearchingBy" Value="false"/>Social Name
+            <InputText id="Searching" @bind-Value="Searching" class="form-control" aria-required="true" @onfocus="@(b=> SearchingByDate=false)" @onkeypress="SearchFor" @onkeydown="SearchFor" @onkeyup="SearchFor"></InputText>
+        </InputRadioGroup>       
     </div>
-    @if (Searching.Length > 0)
-    {
-        <div>
-            <button class="btn btn-danger" @onclick="SearchingReset"><i class="io oi-delete" /> </button>
-        </div>
-    }
+    
 
 </div>
 <hr />
@@ -59,19 +48,21 @@ else
         Show:
         <label><input type="checkbox" @bind="showEmail" /> Email</label>
         <label><input type="checkbox" @bind="showPhoneNumber" /> PhoneNumber</label>
+        <label><input type="checkbox" @bind="showPlace" /> Place</label>
+        <label><input type="checkbox" @bind="showObs" /> Observation</label>
     </p>
     <QuickGrid Items="interviewList.AsQueryable()" Pagination="pagination">
         <TemplateColumn>
             @if (context.InterviewStatusId < 5)
             {
-                <button class="btn btn-primary" onclick="@(() => EmailIt(context))"><i class="oi oi-question-mark" /></button>
+                <button class="btn btn-primary" onclick="@(() => EmailIt(context))" data-toggle="tooltip" title="Send email"><i class="bi bi-envelope" /></button>
             }
         </TemplateColumn>
         <PropertyColumn Property="i => i.InterviewStatus.Status" Title="Status" Sortable="true" />
         <PropertyColumn Property="i=> i.Date" Title="Date" Format="dd/MM" Sortable="true" />
         <PropertyColumn Property="i=> i.StartTime" Title="Start Time" Format="HH:mm" Sortable="true" />
         <PropertyColumn Property="i=> i.EndTime" Title="End Time" Format="HH:mm" Sortable="true" />
-        <PropertyColumn Property="i=> i.Interviewee.SocialName" Title="Social Name" Sortable="true" />
+        <PropertyColumn Property="i=> i.Interviewee.SocialName" Title="Social Name" Sortable="true" />       
         @if (showEmail)
         {
             <PropertyColumn Property="i => i.Interviewee.Email" Title="E-mail" Sortable="true" />
@@ -81,15 +72,25 @@ else
         {
             <PropertyColumn Property="i => i.Interviewee.PhoneNumber" Title="Phone Number" Sortable="true" />
         }
-        <PropertyColumn Property="i => i.Interviewee.Observation" Title="Observation" Sortable="true" />
+
+        @if (showPlace)
+        {
+            <PropertyColumn Property="i => i.Place" Title="Place" Sortable="true" />
+        }
+
+        @if (showObs)
+        {
+            <PropertyColumn Property="i => i.Interviewee.Observation" Title="Observation" Sortable="true" />
+        }
+
         <TemplateColumn>
             @if (context.InterviewStatusId < 5)
             {
-                <button class="btn btn-primary" onclick="@(() => EditIt(context))"><i class="oi oi-pencil" /></button>
+                <button class="btn btn-primary" onclick="@(() => EditIt(context))" data-toggle="tooltip" title="Edit"><i class="oi oi-pencil" /></button>
 
-                <button class="btn btn-primary" onclick="@(() => ConfirmedByTeam(context))"><i class="oi oi-bookmark" /></button>
+                <button class="btn btn-primary" onclick="@(() => ConfirmedByTeam(context))" data-toggle="tooltip" title="Confirm"><i class="bi bi-journal-check" /></button>
 
-                <button class="btn btn-primary" onclick="@(() => CancelIt(context))"><i class="oi oi-account-logout" /></button>
+                <button class="btn btn-primary" onclick="@(() => CancelIt(context))" data-toggle="tooltip" title="Cancel"><i class="bi bi-journal-minus" /></button>
             }
 
         </TemplateColumn>
@@ -109,8 +110,8 @@ else
 
     PaginationState pagination = new PaginationState { ItemsPerPage = 20 };
 
-    Boolean showEmail, showPhoneNumber = false;
-    Boolean SearchingByDate, SearchingBySocialName = false;
+    Boolean showEmail, showPhoneNumber, showObs, showPlace = false;
+    Boolean SearchingByDate;
 
     protected DateTime SearchingDate;
 
@@ -141,8 +142,7 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        SearchingByDate = true;
-        SearchingBySocialName = false;
+        SearchingByDate = true;        
         SearchingDate = DateTime.Today;
         await GetInterviews();
         SearchFor();

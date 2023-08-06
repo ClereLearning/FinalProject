@@ -4,6 +4,7 @@
 @using Microsoft.AspNetCore.Components.WebAssembly.Authentication
 @using Microsoft.AspNetCore.Components.QuickGrid
 @inject IGenderService GenderService
+@inject IIntervieweeService IntervieweeService
 @inject NavigationManager NavigationManager
 @inject HttpClient Http
 @attribute [Authorize]
@@ -26,16 +27,14 @@
 <div class="row">    
     <br />
     <div class="mb-3">
-        <label asp-for="Searching" class="form-control">Search Gender</label>
+        <label asp-for="Searching" class="form-control">Search Gender 
+            @if (Searching.Length > 0)
+            {
+                <button class="btn btn-light" @onclick="SearchingReset"><i class="bi bi-arrow-counterclockwise" data-toggle="tooltip" title="Reset Search" /> </button>
+            }
+        </label>
         <InputText id="Searching" @bind-Value="Searching" class="form-control" aria-required="true" @onkeypress="SearchFor" @onkeydown="SearchFor" @onkeyup="SearchFor"></InputText>
     </div>
-    @if (Searching.Length > 0)
-        {
-            <div>
-                <button class="btn btn-danger" @onclick="SearchingReset"><i class="io oi-delete"/> </button>
-            </div>
-        }
-     
 </div>
 <hr />
 <br />
@@ -44,13 +43,16 @@
     <p> loading </p>
 }
 else
-{
+{    
     <QuickGrid Items="genderList.AsQueryable()" Pagination="pagination">
         <PropertyColumn Property="i => i.Name" Title="Name" Sortable="true"/>                
         <PropertyColumn Property="i=> i.Description" Title="Description" Sortable="true" />
         <TemplateColumn>
-            <button class="btn btn-primary" onclick="@(() => EditIt(context))"><i class="oi oi-pencil" /></button>
-            <button class="btn btn-primary" onclick="@(() => DeleteIt(context))"><i class="oi oi-trash" /></button>
+            <button class="btn btn-primary" onclick="@(() => EditIt(context))" data-toggle="tooltip" title="Edit"><i class="oi oi-pencil" /></button>
+            @if (interviewees.Where(g => g.GenderId == context.Id).ToList().Count() < 1)
+            {
+                <button class="btn btn-primary" onclick="@(() => DeleteIt(context))" data-toggle="tooltip" title="Delete"><i class="oi oi-trash" /></button>
+            }
         </TemplateColumn>
     </QuickGrid>
     <Paginator State="@pagination" />
@@ -64,9 +66,11 @@ else
 
     protected List<Gender> genderList = new();
 
-    protected List<Gender> searchGenderList = new();
+    protected List<Gender> searchGenderList = new();    
 
     PaginationState pagination = new PaginationState { ItemsPerPage = 20 };
+
+    protected List<Interviewee> interviewees = new();
 
     protected void SearchFor()
     {
@@ -79,13 +83,16 @@ else
         {
             genderList = searchGenderList;
         }
+
     }
 
     protected override async Task OnInitializedAsync()
     {        
         await GetGenders();
+        interviewees = await IntervieweeService.GetInterviewees();
         SearchFor();
     }
+
 
     protected async Task GetGenders()
     {
@@ -103,7 +110,7 @@ else
     {
         Searching = string.Empty;
         genderList = searchGenderList;
-    }
+    }       
 
     public void EditIt(Gender g)
     {
@@ -115,10 +122,9 @@ else
         Searching = "";
         @if (!(g.Id == Guid.Empty))
         {
-            await GenderService.DeleteGender(g.Id);            
+            await GenderService.DeleteGender(g.Id);
         }
-        Cancel();
-
+        Cancel();        
     }
-
+    
 }
