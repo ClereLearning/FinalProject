@@ -1,8 +1,4 @@
-﻿using ISAT.Shared.Models;
-using System.Collections.Generic;
-using System.Net.Http.Json;
-using System.Reflection;
-using System.Text.Json;
+﻿using System.Net.Http.Json;
 
 namespace ISAT.Client.Services.GenderService
 {
@@ -10,21 +6,21 @@ namespace ISAT.Client.Services.GenderService
     {
         private readonly HttpClient _httpClient;
 
-       
+
         public GenderService(HttpClient http)
         {
             this._httpClient = http;
         }
-       
+
         public List<Gender> Genders { get; set; } = new List<Gender>();
 
-       
+
 
         public async Task<Gender> GetGender(Guid id)
         {
-            var result = await _httpClient.GetFromJsonAsync<Gender>($"api/gender/{id}");            
+            var result = await _httpClient.GetFromJsonAsync<Gender>($"api/gender/{id}");
             if (result != null)
-            {                
+            {
                 return result;
             }
             throw new Exception("Gender not found!");
@@ -32,18 +28,18 @@ namespace ISAT.Client.Services.GenderService
 
         public async Task<List<Gender>> GetGenders()
         {
-            var result = await _httpClient.GetFromJsonAsync<List<Gender>>("api/gender");       
-            if (result != null) 
+            var result = await _httpClient.GetFromJsonAsync<List<Gender>>("api/gender");
+            if (result != null)
             {
                 return result;
-            }            
+            }
             throw new Exception("Gender empty");
         }
 
         public async Task<Gender> PostGender(Gender gender)
         {
-            var result = await _httpClient.PostAsJsonAsync ("api/gender", gender);
-            var response = await result.Content.ReadFromJsonAsync<Gender>();            
+            var result = await _httpClient.PostAsJsonAsync("api/gender", gender);
+            var response = await result.Content.ReadFromJsonAsync<Gender>();
             if (response != null)
             {
                 return response;
@@ -73,7 +69,7 @@ namespace ISAT.Client.Services.GenderService
 
         public async Task DeleteGender(Guid id)
         {
-            var result = await _httpClient.DeleteAsync($"api/gender/{id}");            
+            var result = await _httpClient.DeleteAsync($"api/gender/{id}");
             if (result != null)
             {
                 return;

@@ -7,6 +7,7 @@
 @using System.Globalization;
 @inject IInterviewService InterviewService
 @inject IInterviewStatusService InterviewStatusService
+@inject AuthenticationStateProvider AuthenticationStateProvider
 @inject NavigationManager NavigationManager
 @inject HttpClient Http
 @attribute [Authorize]
@@ -129,10 +130,25 @@ else
     protected List<Interview> ScheduleList = new();
     PaginationState pagination = new PaginationState { ItemsPerPage = 10 };
 
+    Guid InterviewerId { get; set; }
+
     string btnLabel = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
+        
+        var stateProvider = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var CurrentUser = stateProvider.User;
+
+        foreach (var claim in CurrentUser.Claims)
+        {
+            if (claim.Type == "sub")
+            {
+                InterviewerId = Guid.Parse(claim.Value);
+                break;
+            }
+        }
+
         btnLabel = !String.IsNullOrEmpty(Id.ToString()) ? "Save" : "Update";
 
         DateDefault = DateTime.Today;
@@ -149,6 +165,7 @@ else
         await GetInterviewees();
 
         await GetInterviewsStatus();
+
     }
 
     protected async Task<List<Interviewee>> GetInterviewees()
@@ -167,6 +184,10 @@ else
     protected async Task<List<Interview>> GetInterviews()
     {
         interviews = await InterviewService.GetInterviews();
+
+        // if ClaimInterviewer
+        interviews = interviews.Where(i => i.InterviewerId == InterviewerId).ToList();
+
         return interviews;
     }
 
@@ -199,6 +220,10 @@ else
         {
             TitleDisplaySchedule = "Hourly Schedule " + interview.Date.ToShortDateString();
             var Schedules = await InterviewService.GetInterviews();
+            
+            // if ClaimInterviewer
+            Schedules = Schedules.Where(i => i.InterviewerId == InterviewerId).ToList();
+
             ScheduleList = Schedules.Where(x => (x.Date == interview.Date)).OrderBy(x => x.StartTime)
         .ToList();
         }
@@ -271,7 +296,14 @@ else
     {
         DisplayContentAlert = "";
         PreparingData();
+
         var Schedules = await InterviewService.GetInterviews();
+
+        // if ClaimInterviewer
+        Schedules = Schedules.Where(i => i.InterviewerId == InterviewerId).ToList();
+
+        interview.InterviewerId = InterviewerId;
+
         if (CheckDate(Schedules) && CheckTiming())
         {
             @if (!(Id == Guid.Empty))
@@ -311,6 +343,10 @@ else
             interview.IntervieweeId = interviewee.Id;
 
             var Schedules = await InterviewService.GetInterviews();
+            
+            // if ClaimInterviewer
+            Schedules = Schedules.Where(i => i.InterviewerId == InterviewerId).ToList();
+
             TitleDisplaySchedule = "Hourly Schedule " + DateDefault.ToShortDateString();
             ScheduleList = Schedules.Where(x => (x.Date == DateDefault)).OrderBy(x => x.StartTime)
             .ToList();
@@ -321,6 +357,10 @@ else
             interview = await InterviewService.GetInterview(Id);
             interviewee = interview.Interviewee;
             var Schedules = await InterviewService.GetInterviews();
+
+            // if ClaimInterviewer
+            Schedules = Schedules.Where(i => i.InterviewerId == InterviewerId).ToList();
+
             TitleDisplaySchedule = "Hourly Schedule " + interview.Date.ToShortDateString();
             ScheduleList = Schedules.Where(x => (x.Date == interview.Date)).OrderBy(x => x.StartTime)
             .ToList();

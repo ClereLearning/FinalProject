@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using ISAT.Server.Data;
+﻿using ISAT.Server.Data;
 using ISAT.Shared.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace ISAT.Server.Controllers
 {
@@ -41,10 +36,10 @@ namespace ISAT.Server.Controllers
                 return NotFound();
             }
 
-            return Ok( (Gender)gender);            
+            return Ok((Gender)gender);
         }
 
-      
+
         // POST: api/Gender                
         [HttpPost]
         public async Task<ActionResult<Gender>> PostGender(Gender gender)
@@ -54,7 +49,7 @@ namespace ISAT.Server.Controllers
 
             return CreatedAtAction("GetGender", new { id = gender.Id }, gender);
         }
-        
+
 
         // PUT: api/Gender/5        
         [HttpPut("{id}")]
@@ -107,6 +102,6 @@ namespace ISAT.Server.Controllers
             return _context.Genders.Any(e => e.Id == id);
         }
 
-       
+
     }
 }

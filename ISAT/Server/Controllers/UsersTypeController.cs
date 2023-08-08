@@ -1,17 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
+﻿using ISAT.Server.Data;
+using ISAT.Shared.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using ISAT.Server.Data;
-using ISAT.Shared.Models;
-using Microsoft.AspNetCore.Authorization;
 
 namespace ISAT.Server.Controllers
 {
-    
+
     [Route("api/[controller]")]
     [ApiController]
     public class UsersTypeController : ControllerBase

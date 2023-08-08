@@ -1,8 +1,4 @@
-﻿using ISAT.Shared.Models;
-using System.Collections.Generic;
-using System.Net.Http.Json;
-using System.Reflection;
-using System.Text.Json;
+﻿using System.Net.Http.Json;
 
 namespace ISAT.Client.Services.InterviewService
 {
@@ -12,7 +8,7 @@ namespace ISAT.Client.Services.InterviewService
 
         public InterviewService(HttpClient http)
         {
-            this._httpClient = http;            
+            this._httpClient = http;
         }
 
         public List<Interview> Interviews { get; set; } = new List<Interview>();
@@ -57,7 +53,7 @@ namespace ISAT.Client.Services.InterviewService
             throw new Exception("Interview empty");
         }
 
-       public async Task<Interview> PostInterview(Interview interview)
+        public async Task<Interview> PostInterview(Interview interview)
         {
             var result = await _httpClient.PostAsJsonAsync("api/interview", interview);
             var response = await result.Content.ReadFromJsonAsync<Interview>();
@@ -66,7 +62,7 @@ namespace ISAT.Client.Services.InterviewService
                 return response;
             }
             throw new Exception("Error during Interview creation");
-        }       
+        }
 
         public async Task PutInterview(Guid id, Interview interview)
         {
@@ -79,7 +75,7 @@ namespace ISAT.Client.Services.InterviewService
             throw new Exception("Error during Interview Update");
         }
 
-        public async Task UpdateStatus(Guid id, int statusId) 
+        public async Task UpdateStatus(Guid id, int statusId)
         {
             var result = await _httpClient.DeleteAsync($"api/interview/updatestatus/{id}/{statusId}");
             if (result != null)

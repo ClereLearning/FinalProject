@@ -1,8 +1,4 @@
-﻿using ISAT.Shared.Models;
-using System.Collections.Generic;
-using System.Net.Http.Json;
-using System.Reflection;
-using System.Text.Json;
+﻿using System.Net.Http.Json;
 
 namespace ISAT.Client.Services.UsersTypeService
 {
@@ -63,7 +59,7 @@ namespace ISAT.Client.Services.UsersTypeService
             if (result != null)
             {
                 return;
-            }            
+            }
             throw new Exception("Error during Users Type Update");
         }
     }

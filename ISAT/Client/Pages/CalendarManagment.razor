@@ -5,6 +5,7 @@
 @using Microsoft.AspNetCore.Components.QuickGrid
 @inject IInterviewService InterviewService
 @inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthenticationStateProvider
 @inject HttpClient Http
 @attribute [Authorize]
 
@@ -115,6 +116,8 @@ else
 
     protected DateTime SearchingDate;
 
+    Guid InterviewerId { get; set; }
+
     protected void SearchFor()
     {
         if (SearchingByDate)
@@ -142,6 +145,18 @@ else
 
     protected override async Task OnInitializedAsync()
     {
+        var stateProvider = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var CurrentUser = stateProvider.User;
+
+        foreach (var claim in CurrentUser.Claims)
+        {
+            if (claim.Type == "sub")
+            {
+                InterviewerId = Guid.Parse(claim.Value);
+                break;
+            }
+        }
+
         SearchingByDate = true;        
         SearchingDate = DateTime.Today;
         await GetInterviews();
@@ -151,6 +166,10 @@ else
     protected async Task GetInterviews()
     {
         interviewList = await InterviewService.GetInterviews();
+
+        // if ClaimInterviewer
+        interviewList = interviewList.Where(i => i.InterviewerId == InterviewerId).ToList();
+
         interviewList = interviewList.OrderBy(x => x.StartTime).ToList();
         searchInterviewList = interviewList;
     }

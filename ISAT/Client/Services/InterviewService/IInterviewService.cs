@@ -1,6 +1,4 @@
-﻿using ISAT.Shared.Models;
-
-namespace ISAT.Client.Services.InterviewService
+﻿namespace ISAT.Client.Services.InterviewService
 {
     public interface IInterviewService
     {

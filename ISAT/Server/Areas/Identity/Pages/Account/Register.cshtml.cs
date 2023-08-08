@@ -2,27 +2,18 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 #nullable disable
 
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Text.Encodings.Web;
-using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authorization;
 using ISAT.Server.Models;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
-using Microsoft.Extensions.Logging;
-using ISAT.Shared.Models;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using ISAT.Server.Data;
-using ISAT.Client.Pages;
+using Microsoft.CodeAnalysis.Operations;
+using System.ComponentModel.DataAnnotations;
+using System.Security.Claims;
+using System.Text;
+using System.Text.Encodings.Web;
 
 namespace ISAT.Server.Areas.Identity.Pages.Account
 {
@@ -55,7 +46,7 @@ namespace ISAT.Server.Areas.Identity.Pages.Account
         ///     directly from your code. This API may change or be removed in future releases.
         /// </summary>
         [BindProperty]
-                
+
         public InputModel Input { get; set; }
 
         /// <summary>
@@ -74,6 +65,33 @@ namespace ISAT.Server.Areas.Identity.Pages.Account
         ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
         ///     directly from your code. This API may change or be removed in future releases.
         /// </summary>
+        /// 
+        public class ValidateTokenFromUser: ValidationAttribute 
+        {
+            protected override ValidationResult IsValid(object value, ValidationContext validationContext)
+            {
+                String tokenFromUser = Convert.ToString(value);
+                
+
+                switch (tokenFromUser.Trim())
+                {
+                    case "4E7BDFA8-0F70-4015-B820-EC22CE22083B": //Interviewer
+                        return ValidationResult.Success;
+                        break;
+                    case "3309A5E8-23EB-4A89-B594-DB0F7561212E": //Administrative
+                        return ValidationResult.Success;
+                        break;
+                    case "7197C2CF-207B-4550-90E2-89F676FDDC73": //Researcher
+                        return ValidationResult.Success;
+                        break;
+                    default:
+                        return new ValidationResult(ErrorMessage);
+                        break;
+                }
+
+                return base.IsValid(value, validationContext);
+            }
+        }
         public class InputModel
         {
             /// <summary>
@@ -104,7 +122,7 @@ namespace ISAT.Server.Areas.Identity.Pages.Account
             [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
             public string ConfirmPassword { get; set; }
 
-            [Required]            
+            [Required]
             [Display(Name = "First Name")]
             public string FirstName { get; set; } = string.Empty;
 
@@ -120,10 +138,15 @@ namespace ISAT.Server.Areas.Identity.Pages.Account
             [Display(Name = "Phone Number")]
             public string PhoneNumber { get; set; } = string.Empty;
 
-           /*
-            [Display(Name = "User`s Type")]
-            public UsersType? UsersType { get; set; }            
-           */
+            [Required]
+            [Display(Name = "Token")]
+            [ValidateTokenFromUser(ErrorMessage = "Invalid Token. Please verify.")]
+            public string Token { get; set; } = string.Empty;
+
+            /*
+             [Display(Name = "User`s Type")]
+             public UsersType? UsersType { get; set; }            
+            */
         }
 
 
@@ -136,6 +159,38 @@ namespace ISAT.Server.Areas.Identity.Pages.Account
 
         public async Task<IActionResult> OnPostAsync(string returnUrl = null)
         {
+            // verifying token
+            bool TokenOk = false;
+            var claimResearcher = new Claim("Researcher", "Researcher");
+            var claimAdministrative = new Claim("Administrative", "Administrative");
+            var claimInterviewer = new Claim("Interviewer", "Interviewer");
+            Claim claimReg = null;
+            switch (Input.Token.Trim())
+            {
+                case "4E7BDFA8-0F70-4015-B820-EC22CE22083B": //Interviewer
+                    TokenOk = true;
+                    claimReg = claimInterviewer;
+                    break;
+                case "3309A5E8-23EB-4A89-B594-DB0F7561212E": //Administrative
+                    TokenOk = true;
+                    claimReg = claimAdministrative;
+                    break;
+                case "7197C2CF-207B-4550-90E2-89F676FDDC73": //Researcher
+                    TokenOk = true;
+                    claimReg = claimResearcher;
+                    break;
+                default:
+                    TokenOk = true;
+                    break;
+            }
+
+            if(!TokenOk)
+            {
+                _logger.LogInformation("Invalid Token ");
+                return Page();
+            }
+            
+
             returnUrl ??= Url.Content("~/");
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
             if (ModelState.IsValid)
@@ -161,6 +216,11 @@ namespace ISAT.Server.Areas.Identity.Pages.Account
                     var userId = await _userManager.GetUserIdAsync(user);
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
                     code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
+
+                    //adding claim
+                    var claimsUser = await _userManager.AddClaimAsync(user, claimReg );
+
+
                     var callbackUrl = Url.Page(
                         "/Account/ConfirmEmail",
                         pageHandler: null,

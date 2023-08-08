@@ -4,6 +4,7 @@ using ISAT.Server.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ISAT.Server.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230807012732_UpdateDatabase")]
+    partial class UpdateDatabase
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -280,13 +283,13 @@ namespace ISAT.Server.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("061298d2-9a7c-43d0-ae5f-ca77bf5f64e2"),
+                            Id = new Guid("6792559f-eb77-41af-9c45-ad35fbfc1350"),
                             Description = "Was not asked",
                             Name = "Not asked"
                         },
                         new
                         {
-                            Id = new Guid("3dfa3014-20dd-4ca8-aefc-476635d27186"),
+                            Id = new Guid("d01c4b42-aefb-4e31-9b03-7452705aa369"),
                             Description = "Asked but, not informed",
                             Name = "Not Informed"
                         });
@@ -327,9 +330,6 @@ namespace ISAT.Server.Migrations
                         .HasColumnType("int");
 
                     b.Property<Guid?>("IntervieweeId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("InterviewerId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Notes")
@@ -495,6 +495,9 @@ namespace ISAT.Server.Migrations
 
             modelBuilder.Entity("ISAT.Shared.Models.Interviewer", b =>
                 {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -504,9 +507,6 @@ namespace ISAT.Server.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid?>("GenderId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("Id")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<bool>("Inactive")
@@ -530,6 +530,8 @@ namespace ISAT.Server.Migrations
                     b.Property<Guid?>("UsersTypeId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.HasKey("Id");
+
                     b.HasIndex("GenderId");
 
                     b.HasIndex("SexualOrientationId");
@@ -538,7 +540,7 @@ namespace ISAT.Server.Migrations
 
                     b.ToTable((string)null);
 
-                    b.ToView("Interviewers", "dbo");
+                    b.ToView("Interviewer", "dbo");
                 });
 
             modelBuilder.Entity("ISAT.Shared.Models.SexualOrientation", b =>
@@ -562,13 +564,13 @@ namespace ISAT.Server.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("10526339-0329-48f9-b2d8-6dc4ce3ee34b"),
+                            Id = new Guid("3315af7d-70e4-4ddd-a838-ee99f401e15e"),
                             Description = "Was not asked",
                             Name = "Not asked"
                         },
                         new
                         {
-                            Id = new Guid("5bc47d05-745d-49a8-a12f-545d53230978"),
+                            Id = new Guid("b17ae524-3747-45d8-9517-95cb7ca79025"),
                             Description = "Asked but, not informed",
                             Name = "Not Informed"
                         });
@@ -598,21 +600,21 @@ namespace ISAT.Server.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("f691dbf1-e126-431c-b7a3-1bc23ae070d6"),
+                            Id = new Guid("3309a5e8-23eb-4a89-b594-db0f7561212e"),
                             Deletable = false,
                             Description = "Administrative Users",
                             Name = "Administrative"
                         },
                         new
                         {
-                            Id = new Guid("a8955dd5-a326-4223-abd0-78d0e11bbe53"),
+                            Id = new Guid("4e7bdfa8-0f70-4015-b820-ec22ce22083b"),
                             Deletable = false,
                             Description = "Interviewer Users",
                             Name = "Interviewer"
                         },
                         new
                         {
-                            Id = new Guid("55132f64-4e77-4cce-a565-9f3c315b92e0"),
+                            Id = new Guid("7197c2cf-207b-4550-90e2-89f676fddc73"),
                             Deletable = false,
                             Description = "Researcher Users",
                             Name = "Researcher"

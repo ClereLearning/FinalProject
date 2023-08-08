@@ -1,14 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using ISAT.Server.Data;
+﻿using ISAT.Server.Data;
 using ISAT.Shared.Models;
 using Microsoft.AspNetCore.Authorization;
-using Duende.IdentityServer.Extensions;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace ISAT.Server.Controllers
 {
@@ -40,7 +34,7 @@ namespace ISAT.Server.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Interview>> GetInterview(Guid id)
         {
-           // var interview = await _context.Interviews.FindAsync(id);
+            // var interview = await _context.Interviews.FindAsync(id);
             var interview = await _context.Interviews
                 .Include(p => p.Interviewee)
                 .Include(s => s.InterviewStatus)
@@ -89,12 +83,12 @@ namespace ISAT.Server.Controllers
         // POST: api/interview         
         [HttpPost]
         public async Task<ActionResult<Interview>> PostInterview(Interview interview)
-        {            
+        {
             _context.Interviews.Add(interview);
             await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetInterview", new { id = interview.Id }, interview);
-        }        
+        }
 
         // DELETE: api/Interview/5
         [HttpDelete("{id}")]
@@ -127,8 +121,8 @@ namespace ISAT.Server.Controllers
         // GET: api/Audios
         [HttpGet("audios")]
         public async Task<ActionResult<IEnumerable<Interview>>> GetAudioInterviews()
-        {            
-            return await _context.Interviews.Where(a=> (a.InterviewStatusId==3) || (a.InterviewStatusId == 4) || (a.InterviewStatusId == 7) || (a.InterviewStatusId == 9))
+        {
+            return await _context.Interviews.Where(a => (a.InterviewStatusId == 3) || (a.InterviewStatusId == 4) || (a.InterviewStatusId == 7) || (a.InterviewStatusId == 9))
                 .Include("Interviewee")
                 .Include("InterviewStatus")
                 .ToListAsync();

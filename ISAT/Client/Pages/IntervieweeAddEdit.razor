@@ -4,7 +4,9 @@
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.WebAssembly.Authentication
 @inject IIntervieweeService IntervieweeService
+@inject IInterviewerService InterviewerService
 @inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthenticationStateProvider
 @inject HttpClient Http
 @attribute [Authorize]
 
@@ -113,6 +115,8 @@ else
 
     string btnLabel = string.Empty;
 
+    Guid InterviewerId { get; set; }
+
     protected override async Task OnInitializedAsync()
     {
         btnLabel = (interviewee.Id == Guid.Empty) ? "Save" : "Update";
@@ -120,7 +124,25 @@ else
         await GetInterviewees();
         await GetSexualOrientations();
         await GetGenders();
+        await GetInterviewerInfo();
     }
+
+    protected async Task GetInterviewerInfo()
+    {
+        var stateProvider = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var CurrentUser = stateProvider.User;        
+
+        foreach (var claim in CurrentUser.Claims)
+        {
+            if (claim.Type == "sub")
+            {
+                InterviewerId = Guid.Parse(claim.Value);
+                break;
+            }           
+        }
+
+    }
+
 
     protected async Task<List<SexualOrientation>> GetSexualOrientations()
     {
@@ -146,10 +168,12 @@ else
         Boolean IntevieweeExists = false;
         DisplayAlert = "d-none";
         DisplayContentAlert = "The Inteviewee already exists - Email or Phone Number";
+                
+        interviewee.InterviewerId = InterviewerId;
 
         if (!(interviewee.Id == Guid.Empty))
         {
-
+            
             if (!String.IsNullOrEmpty(interviewee.Email.Trim()))
             {
                 if (interviewees.Where(i => i.Email == interviewee.Email && i.Id!=interviewee.Id).ToList().Count() > 0)
@@ -184,7 +208,7 @@ else
         }
         else
         {
-
+                       
 
             if (!String.IsNullOrEmpty(interviewee.Email.Trim()))
             {

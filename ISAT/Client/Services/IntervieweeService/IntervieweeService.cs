@@ -1,8 +1,4 @@
-﻿using ISAT.Shared.Models;
-using System.Collections.Generic;
-using System.Net.Http.Json;
-using System.Reflection;
-using System.Text.Json;
+﻿using System.Net.Http.Json;
 
 namespace ISAT.Client.Services.IntervieweeService
 {
@@ -35,8 +31,8 @@ namespace ISAT.Client.Services.IntervieweeService
             if (result != null)
             {
                 return result;
-            }           
-            throw new Exception("Interviewee empty");           
+            }
+            throw new Exception("Interviewee empty");
         }
 
         public async Task<Interviewee> PostInterviewee(Interviewee interviewee)
@@ -109,5 +105,6 @@ namespace ISAT.Client.Services.IntervieweeService
             }
             throw new Exception("Interviewee empty");
         }
+                
     }
 }

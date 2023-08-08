@@ -7,6 +7,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+   </ItemGroup>
+
+  <ItemGroup>
     <SupportedPlatform Include="browser" />
   </ItemGroup>
 </Project>

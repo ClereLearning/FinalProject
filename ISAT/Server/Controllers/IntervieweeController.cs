@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
+﻿using ISAT.Server.Data;
+using ISAT.Shared.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using ISAT.Server.Data;
-using ISAT.Shared.Models;
 
 namespace ISAT.Server.Controllers
 {
@@ -137,7 +132,8 @@ namespace ISAT.Server.Controllers
         [HttpGet("{email}/{PhoneNumber}")]
         public async Task<ActionResult<IEnumerable<Interviewee>>> GetInterviewees(string email, string PhoneNumber)
         {
-            return await _context.Interviewees.Where(i => i.Email == email || i.PhoneNumber == PhoneNumber).ToListAsync();          
+            return await _context.Interviewees.Where(i => i.Email == email || i.PhoneNumber == PhoneNumber).ToListAsync();
         }
+               
     }
 }

@@ -1,13 +1,10 @@
-﻿using Duende.IdentityServer.EntityFramework.Extensions;
-using Duende.IdentityServer.EntityFramework.Options;
+﻿using Duende.IdentityServer.EntityFramework.Options;
 using ISAT.Server.Models;
 using ISAT.Shared.Models;
 using Microsoft.AspNetCore.ApiAuthorization.IdentityServer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.Extensions.Options;
-using System.Reflection.Emit;
 
 namespace ISAT.Server.Data
 {
@@ -62,7 +59,6 @@ namespace ISAT.Server.Data
                 b.ToTable("UserRoles");
             });
 
-            //builder.Entity<Interviewee>().Navigation(e => e.Gender).AutoInclude();
 
             builder.Entity<SexualOrientation>().HasData(
                 new SexualOrientation
@@ -93,7 +89,6 @@ namespace ISAT.Server.Data
                   Description = "Asked but, not informed"
               }
               );
-
 
 
             builder.Entity<InterviewStatus>().HasData(
@@ -127,18 +122,18 @@ namespace ISAT.Server.Data
              },
            new InterviewStatus
            {
-               Id =5,
+               Id = 5,
                Description = "Canceled",
                Status = "Canceled",
                Inactive = false
-           },         
+           },
             new InterviewStatus
             {
                 Id = 6,
                 Description = "Canceled by Team",
                 Status = "Canceled by Team",
                 Inactive = false
-            },            
+            },
             new InterviewStatus
             {
                 Id = 7,
@@ -192,6 +187,13 @@ namespace ISAT.Server.Data
                }
                );
 
+
+            builder.Entity<Interviewer>(b =>            
+            {
+                b.ToView("Interviewers");
+                b.HasNoKey();
+            });
+
         }
 
         public DbSet<Gender> Genders { get; set; }
@@ -201,8 +203,6 @@ namespace ISAT.Server.Data
         public DbSet<Interview> Interviews { get; set; }
         public DbSet<InterviewStatus> InterviewsStatus { get; set; }
         public DbSet<Interviewer> Interviewers { get; set; }
-        public DbSet<DaysOff> DaysOffs { get; set; }
-        public DbSet<Availability> Availabilities { get; set; }
 
     }
 }

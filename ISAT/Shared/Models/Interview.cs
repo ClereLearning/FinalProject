@@ -1,11 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Runtime.InteropServices;
 
 namespace ISAT.Shared.Models
 {
@@ -23,11 +17,11 @@ namespace ISAT.Shared.Models
         [Required]
         public DateTime Date { get; set; }
 
-        [Required]        
+        [Required]
         [Display(Name = "Start time")]
         public DateTime StartTime { get; set; }
 
-        [Required]        
+        [Required]
         [Display(Name = "End time")]
         public DateTime EndTime { get; set; }
 
@@ -36,14 +30,14 @@ namespace ISAT.Shared.Models
         [ForeignKey("IntervieweeId")]
         public virtual Interviewee? Interviewee { get; set; }
 
-        
+
         public Guid? IntervieweeId { get; set; }
 
 
         [Display(Name = "Status")]
         [ForeignKey("InterviewStatusId")]
-        public virtual InterviewStatus? InterviewStatus { get; set; }                        
-        
+        public virtual InterviewStatus? InterviewStatus { get; set; }
+
         public int? InterviewStatusId { get; set; }
 
         [Required]
@@ -64,6 +58,9 @@ namespace ISAT.Shared.Models
 
         [Display(Name = "Notes")]
         public string Notes { get; set; } = string.Empty;
+
+        [Display(Name = "Interviewer")]
+        public Guid? InterviewerId { get; set; }
 
     }
 }

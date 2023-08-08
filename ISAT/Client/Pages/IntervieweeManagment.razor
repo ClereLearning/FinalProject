@@ -6,35 +6,41 @@
 @inject IIntervieweeService IntervieweeService
 @inject IInterviewService InterviewService
 @inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthenticationStateProvider
 @inject HttpClient Http
 @attribute [Authorize]
 
 <PageTitle> Interviewee Managment </PageTitle>
 
-<h3>Interviewee Managment</h3>
+<h3>Interviewee Managment </h3>
 <br />
-<hr />
-<div class="row">
-    <div class="col-md-6">
-        <a href='/intervieweeaddedit' class="btn btn-primary" role="button">
-            <i class="oi oi-plus"></i>
-            Add Interviewee
-        </a>
-    </div>
-</div>
-<br />
+<AuthorizeView>
+    <Authorized>        
+        <hr />
+        <div class="row">
+            <div class="col-md-6">
+                <a href='/intervieweeaddedit' class="btn btn-primary" role="button">
+                    <i class="oi oi-plus"></i>
+                    Add Interviewee
+                </a>
+            </div>
+        </div>
+        <br />
+    </Authorized>
+</AuthorizeView>
 <hr />
 <div class="row">
     <br />
     <div class="mb-3">
-        <label asp-for="Searching" class="form-control">Search Interviewee 
+        <label asp-for="Searching" class="form-control">
+            Search Interviewee
             @if (Searching.Length > 0)
             {
                 <button class="btn btn-light" @onclick="SearchingReset"><i class="bi bi-arrow-counterclockwise" data-toggle="tooltip" title="Reset Search" /> </button>
             }
         </label>
         <InputText id="Searching" @bind-Value="Searching" class="form-control" aria-required="true" @onkeypress="SearchFor" @onkeydown="SearchFor" @onkeyup="SearchFor"></InputText>
-    </div>    
+    </div>
 </div>
 <h3>List of Interviewees</h3>
 <hr />
@@ -48,10 +54,10 @@ else
     <QuickGrid Items="intervieweeList.AsQueryable()" Pagination="pagination">
         <PropertyColumn Property="i=> i.SocialName" Title="Social Name" Sortable="true" />
         <PropertyColumn Property="i => i.FirstName" Title="First Name" Sortable="true" />
-        <PropertyColumn Property="i=> i.LastName" Title="Last Name" Sortable="true" />        
+        <PropertyColumn Property="i=> i.LastName" Title="Last Name" Sortable="true" />
         <PropertyColumn Property="i=> i.Email" Title="E-mail" Sortable="true" />
         <PropertyColumn Property="i=> i.PhoneNumber" Title="Phone number" Sortable="true" />
-            <!--
+        <!--
         <PropertyColumn Property="i=> i.Inactive" Title="Inactive" Sortable="true" />
             -->
         <TemplateColumn>
@@ -71,6 +77,8 @@ else
 
     public string Searching { get; set; } = string.Empty;
 
+    public string idu { get; set; } = string.Empty;
+
     protected List<Interviewee> intervieweeList = new();
 
     protected List<Interviewee> searchIntervieweeList = new();
@@ -78,6 +86,8 @@ else
     protected List<Interview> interviews = new();
 
     PaginationState pagination = new PaginationState { ItemsPerPage = 20 };
+
+    Guid InterviewerId { get; set; }
 
     protected void SearchFor()
     {
@@ -97,6 +107,19 @@ else
         await GetInterviewees();
         interviews = await InterviewService.GetInterviews();
         SearchFor();
+
+        var stateProvider = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var CurrentUser = stateProvider.User;
+
+        foreach (var claim in CurrentUser.Claims)
+        {
+            if (claim.Type == "sub")
+            {
+                InterviewerId = Guid.Parse(claim.Value);
+                break;
+            }
+        }
+
     }
 
     protected async Task GetInterviewees()

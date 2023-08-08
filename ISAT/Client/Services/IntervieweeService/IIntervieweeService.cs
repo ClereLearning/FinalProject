@@ -1,5 +1,4 @@
-﻿using ISAT.Shared.Models;
-namespace ISAT.Client.Services.IntervieweeService
+﻿namespace ISAT.Client.Services.IntervieweeService
 {
     public interface IIntervieweeService
     {
@@ -11,7 +10,7 @@ namespace ISAT.Client.Services.IntervieweeService
         public Task DeleteInterviewee(Guid id);
         public Task<List<SexualOrientation>> GetSexualOrientations();
         public Task<List<Gender>> GetGenders();
-        public Task<List<Interviewee>> GetIntervieweeByEmailOrPhoneNumber(string email, string PhoneNumber);
-        
+        public Task<List<Interviewee>> GetIntervieweeByEmailOrPhoneNumber(string email, string PhoneNumber);    
+
     }
 }

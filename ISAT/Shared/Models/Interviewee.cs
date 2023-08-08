@@ -1,11 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Linq;
 
 namespace ISAT.Shared.Models
 {
@@ -35,7 +29,7 @@ namespace ISAT.Shared.Models
         public string PhoneNumber { get; set; } = string.Empty;
         public bool Inactive { get; set; } = false;
 
-        
+
         [Required]
         [Display(Name = "Gender")]
         [NotMapped]
@@ -58,6 +52,9 @@ namespace ISAT.Shared.Models
 
         [Display(Name = "Observation")]
         public string Observation { get; set; } = string.Empty;
+
+        [Display(Name = "Interviewer")]
+        public Guid? InterviewerId { get; set; }
 
     }
 }

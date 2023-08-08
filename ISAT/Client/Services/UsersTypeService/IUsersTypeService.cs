@@ -1,6 +1,4 @@
-﻿using ISAT.Shared.Models;
-
-namespace ISAT.Client.Services.UsersTypeService
+﻿namespace ISAT.Client.Services.UsersTypeService
 {
     public interface IUsersTypeService
     {
