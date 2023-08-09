@@ -8,11 +8,13 @@
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject HttpClient Http
 @attribute [Authorize]
+@inject IJSRuntime Ijs // to run javascript
 
 <PageTitle> Calendar Managment </PageTitle>
 
 <h3>Calendar Managment - List of Interviews</h3>
 <br />
+<button class="btn btn-light" @onclick="PrintIt"><i class="bi bi-printer" data-toggle="tooltip" title="Print" /> </button>
 <hr />
 <div class="row">
     <br />
@@ -224,6 +226,11 @@ else
             await InterviewService.UpdateStatus(i.Id, 4); //4 Confirmed by Team
         }
         Cancel();
+    }
+
+    protected async Task PrintIt()
+    {
+        await Ijs.InvokeVoidAsync("window.print");
     }
 
 }

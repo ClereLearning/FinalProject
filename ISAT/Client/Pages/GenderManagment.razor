@@ -8,11 +8,13 @@
 @inject NavigationManager NavigationManager
 @inject HttpClient Http
 @attribute [Authorize]
+@inject IJSRuntime Ijs // to run javascript
 
 <PageTitle> Gender Managment </PageTitle>
 
 <h3>List of Genders</h3>
 <br />
+<button class="btn btn-light" @onclick="PrintIt"><i class="bi bi-printer" data-toggle="tooltip" title="Print" /> </button>
 <AuthorizeView Roles="Administrative">
     <Authorized>
         <hr />
@@ -130,6 +132,11 @@ else
             await GenderService.DeleteGender(g.Id);
         }
         Cancel();
+    }
+
+    protected async Task PrintIt()
+    {
+        await Ijs.InvokeVoidAsync("window.print");
     }
 
 }

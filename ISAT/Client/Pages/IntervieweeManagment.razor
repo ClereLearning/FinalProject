@@ -10,11 +10,13 @@
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject HttpClient Http
 @attribute [Authorize]
+@inject IJSRuntime Ijs // to run javascript
 
 <PageTitle> Interviewee Managment </PageTitle>
 
 <h3>Interviewee Managment </h3>
 <br />
+<button class="btn btn-light" @onclick="PrintIt"><i class="bi bi-printer" data-toggle="tooltip" title="Print" /> </button>
 <AuthorizeView Roles="Interviewer">
     <Authorized>
         <hr />
@@ -60,15 +62,15 @@ else
         <PropertyColumn Property="i=> i.PhoneNumber" Title="Phone number" Sortable="true" />
         <!--
         <PropertyColumn Property="i=> i.Inactive" Title="Inactive" Sortable="true" />
-            -->        
-                <TemplateColumn>
-                    <button class="btn btn-primary" onclick="@(() => EditIt(context))" data-toggle="tooltip" title="Edit"><i class="oi oi-pencil" /></button>
+            -->
+        <TemplateColumn>
+            <button class="btn btn-primary" onclick="@(() => EditIt(context))" data-toggle="tooltip" title="Edit"><i class="oi oi-pencil" /></button>
 
-                    @if (interviews.Where(x => x.IntervieweeId == context.Id).ToList().Count() < 1)
-                    {
-                        <button class="btn btn-primary" onclick="@(() => DeleteIt(context))" data-toggle="tooltip" title="Delete"><i class="oi oi-trash" /></button>
-                    }
-                </TemplateColumn>            
+            @if (interviews.Where(x => x.IntervieweeId == context.Id).ToList().Count() < 1)
+            {
+                <button class="btn btn-primary" onclick="@(() => DeleteIt(context))" data-toggle="tooltip" title="Delete"><i class="oi oi-trash" /></button>
+            }
+        </TemplateColumn>
     </QuickGrid>
     <Paginator State="@pagination" />
 }
@@ -155,6 +157,11 @@ else
         }
         Cancel();
 
+    }
+
+    protected async Task PrintIt()
+    {
+        await Ijs.InvokeVoidAsync("window.print");
     }
 
 }

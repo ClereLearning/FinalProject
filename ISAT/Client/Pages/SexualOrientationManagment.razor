@@ -8,12 +8,14 @@
 @inject NavigationManager NavigationManager
 @inject HttpClient Http
 @attribute [Authorize]
+@inject IJSRuntime Ijs // to run javascript
 
 
 <PageTitle> Sexual Orientation Managment </PageTitle>
 
 <h3>Sexual Orientation Managment</h3>
 
+<button class="btn btn-light" @onclick="PrintIt"><i class="bi bi-printer" data-toggle="tooltip" title="Print" /> </button>
 <AuthorizeView Roles="Administrative">
     <Authorized>
         <br />
@@ -130,6 +132,10 @@ else
             await SexualOrientationService.DeleteSexualOrientation(s.Id);
         }
         Cancel();
+    }
 
+    protected async Task PrintIt()
+    {
+        await Ijs.InvokeVoidAsync("window.print");
     }
 }

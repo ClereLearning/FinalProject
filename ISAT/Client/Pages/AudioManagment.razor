@@ -8,8 +8,12 @@
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject HttpClient Http
 @attribute [Authorize]
+@inject IJSRuntime Ijs // to run javascript
 
 <PageTitle> Audio Managment </PageTitle>
+<h3>Audio Managment</h3>
+<br />
+<button class="btn btn-light" @onclick="PrintIt"><i class="bi bi-printer" data-toggle="tooltip" title="Print" /> </button>
 <AuthorizeView Roles="Interviewer">
     <Authorized>
         <br />
@@ -162,6 +166,11 @@ else
         }
         Cancel();
 
+    }
+
+    protected async Task PrintIt()
+    {
+        await Ijs.InvokeVoidAsync("window.print");
     }
 
 }

@@ -8,13 +8,14 @@
 @inject HttpClient Http
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @attribute [Authorize]
-
+@inject IJSRuntime Ijs // to run javascript
 
 <PageTitle> User's Type Managment </PageTitle>
 
 <h3>User's Type Managment</h3>
 
 <br />
+<button class="btn btn-light" @onclick="PrintIt"><i class="bi bi-printer" data-toggle="tooltip" title="Print" /> </button>
 <AuthorizeView Roles="Administrative">
     <Authorized>
         <hr />
@@ -54,10 +55,10 @@ else
     <QuickGrid Items="usersTypeList.AsQueryable()" Pagination="pagination">
         <PropertyColumn Property="i => i.Name" Title="Name" Sortable="true" />
         <PropertyColumn Property="i=> i.Description" Title="Description" Sortable="true" />
-            <TemplateColumn>                
-                <button class="btn btn-primary" onclick="@(() => EditIt(context))" data-toggle="tooltip" title="Edit"><i class="oi oi-pencil" /></button>
-                <button class="btn btn-primary" onclick="@(() => DeleteIt(context))" data-toggle="tooltip" title="Delete"><i class="oi oi-trash" /></button>
-            </TemplateColumn>    
+        <TemplateColumn>
+            <button class="btn btn-primary" onclick="@(() => EditIt(context))" data-toggle="tooltip" title="Edit"><i class="oi oi-pencil" /></button>
+            <button class="btn btn-primary" onclick="@(() => DeleteIt(context))" data-toggle="tooltip" title="Delete"><i class="oi oi-trash" /></button>
+        </TemplateColumn>
     </QuickGrid>
     <Paginator State="@pagination" />
 
@@ -125,7 +126,11 @@ else
             await UsersTypeService.DeleteUsersType(u.Id);
         }
         Cancel();
+    }
 
+    protected async Task PrintIt()
+    {
+        await Ijs.InvokeVoidAsync("window.print");
     }
 
 }

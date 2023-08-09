@@ -30,9 +30,7 @@ builder.Services.AddScoped<IIntervieweeService, IntervieweeService>();
 builder.Services.AddScoped<IInterviewService, InterviewService>();
 builder.Services.AddScoped<IInterviewStatusService, InterviewStatusService>();
 builder.Services.AddScoped<IInterviewerService, InterviewerService>();
-
 builder.Services.AddAuthorizationCore();
-   
 
 /*
 builder.Services.AddAuthorizationCore(options => {
