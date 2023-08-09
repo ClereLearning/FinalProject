@@ -31,16 +31,8 @@ builder.Services.AddScoped<IInterviewService, InterviewService>();
 builder.Services.AddScoped<IInterviewStatusService, InterviewStatusService>();
 builder.Services.AddScoped<IInterviewerService, InterviewerService>();
 
-builder.Services.AddAuthorizationCore(options =>
-{
-    options.AddPolicy("PolicyInterviewer", policy =>
-    {
-        policy.RequireAssertion(context => context.User.HasClaim(c =>
-        {
-            return c.Type == "Interviewer" && c.Value.Contains("Interviewer");
-        }));
-    });
-});
+builder.Services.AddAuthorizationCore();
+   
 
 /*
 builder.Services.AddAuthorizationCore(options => {
@@ -51,6 +43,8 @@ builder.Services.AddAuthorizationCore(options => {
 */
 
 
-builder.Services.AddApiAuthorization();
+//builder.Services.AddApiAuthorization();
+builder.Services.AddApiAuthorization()
+    .AddAccountClaimsPrincipalFactory<CustUserFactory>();
 
 await builder.Build().RunAsync();

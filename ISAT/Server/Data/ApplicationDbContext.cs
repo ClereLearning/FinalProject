@@ -23,6 +23,24 @@ namespace ISAT.Server.Data
 
             builder.HasDefaultSchema("dbo");
 
+            var admin = new IdentityRole("Administrative");
+            admin.NormalizedName = admin.Name.ToLower();
+
+            var interviewer = new IdentityRole("Interviewer");
+            interviewer.NormalizedName = interviewer.Name.ToLower();
+
+            var researcher = new IdentityRole("Researcher");
+            researcher.NormalizedName = researcher.Name.ToLower();
+
+            List<IdentityRole> roles = new List<IdentityRole>();
+            roles.Add(admin);
+            roles.Add(interviewer);
+            roles.Add(researcher);
+            builder.Entity<IdentityRole>().HasData(roles);
+
+
+
+            /*
             builder.Entity<IdentityUser>(b =>
             {
                 b.ToTable("User");
@@ -58,7 +76,7 @@ namespace ISAT.Server.Data
             {
                 b.ToTable("UserRoles");
             });
-
+            */
 
             builder.Entity<SexualOrientation>().HasData(
                 new SexualOrientation

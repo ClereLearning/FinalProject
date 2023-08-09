@@ -3,6 +3,7 @@
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.WebAssembly.Authentication
 @using Microsoft.AspNetCore.Components.QuickGrid
+@using System.Security.Claims;
 @inject IIntervieweeService IntervieweeService
 @inject IInterviewService InterviewService
 @inject NavigationManager NavigationManager
@@ -14,8 +15,8 @@
 
 <h3>Interviewee Managment </h3>
 <br />
-<AuthorizeView>
-    <Authorized>        
+<AuthorizeView Roles="Interviewer">
+    <Authorized>
         <hr />
         <div class="row">
             <div class="col-md-6">
@@ -59,15 +60,15 @@ else
         <PropertyColumn Property="i=> i.PhoneNumber" Title="Phone number" Sortable="true" />
         <!--
         <PropertyColumn Property="i=> i.Inactive" Title="Inactive" Sortable="true" />
-            -->
-        <TemplateColumn>
-            <button class="btn btn-primary" onclick="@(() => EditIt(context))" data-toggle="tooltip" title="Edit"><i class="oi oi-pencil" /></button>
+            -->        
+                <TemplateColumn>
+                    <button class="btn btn-primary" onclick="@(() => EditIt(context))" data-toggle="tooltip" title="Edit"><i class="oi oi-pencil" /></button>
 
-            @if (interviews.Where(x => x.IntervieweeId == context.Id).ToList().Count() < 1)
-            {
-                <button class="btn btn-primary" onclick="@(() => DeleteIt(context))" data-toggle="tooltip" title="Delete"><i class="oi oi-trash" /></button>
-            }
-        </TemplateColumn>
+                    @if (interviews.Where(x => x.IntervieweeId == context.Id).ToList().Count() < 1)
+                    {
+                        <button class="btn btn-primary" onclick="@(() => DeleteIt(context))" data-toggle="tooltip" title="Delete"><i class="oi oi-trash" /></button>
+                    }
+                </TemplateColumn>            
     </QuickGrid>
     <Paginator State="@pagination" />
 }

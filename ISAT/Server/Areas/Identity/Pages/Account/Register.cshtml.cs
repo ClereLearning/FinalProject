@@ -164,20 +164,34 @@ namespace ISAT.Server.Areas.Identity.Pages.Account
             var claimResearcher = new Claim("Researcher", "Researcher");
             var claimAdministrative = new Claim("Administrative", "Administrative");
             var claimInterviewer = new Claim("Interviewer", "Interviewer");
+
+            var adminRole = new IdentityRole("Administrative");
+            adminRole.NormalizedName = adminRole.Name.ToLower();
+
+            var interviewerRole = new IdentityRole("Interviewer");
+            interviewerRole.NormalizedName = interviewerRole.Name.ToLower();
+
+            var researcherRole = new IdentityRole("Researcher");
+            researcherRole.NormalizedName = researcherRole.Name.ToLower();
+
             Claim claimReg = null;
+            IdentityRole roleReg = null;
             switch (Input.Token.Trim())
             {
                 case "4E7BDFA8-0F70-4015-B820-EC22CE22083B": //Interviewer
                     TokenOk = true;
                     claimReg = claimInterviewer;
+                    roleReg = interviewerRole;
                     break;
                 case "3309A5E8-23EB-4A89-B594-DB0F7561212E": //Administrative
                     TokenOk = true;
                     claimReg = claimAdministrative;
+                    roleReg = adminRole;
                     break;
                 case "7197C2CF-207B-4550-90E2-89F676FDDC73": //Researcher
                     TokenOk = true;
                     claimReg = claimResearcher;
+                    roleReg = researcherRole;
                     break;
                 default:
                     TokenOk = true;
@@ -219,6 +233,10 @@ namespace ISAT.Server.Areas.Identity.Pages.Account
 
                     //adding claim
                     var claimsUser = await _userManager.AddClaimAsync(user, claimReg );
+
+                    //adding Role
+
+                    var roleUser = await _userManager.AddToRoleAsync(user, roleReg.Name);
 
 
                     var callbackUrl = Url.Page(

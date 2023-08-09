@@ -14,22 +14,27 @@
 
 <h3>Sexual Orientation Managment</h3>
 
-<br />
-<hr />
-<div class="row">
-    <div class="col-md-6">
-        <a href='/sexualorientationaddedit' class="btn btn-primary" role="button">
-            <i class="oi oi-plus"></i>
-            Add Sexual Orientation
-        </a>
-    </div>
-</div>
+<AuthorizeView Roles="Administrative">
+    <Authorized>
+        <br />
+        <hr />
+        <div class="row">
+            <div class="col-md-6">
+                <a href='/sexualorientationaddedit' class="btn btn-primary" role="button">
+                    <i class="oi oi-plus"></i>
+                    Add Sexual Orientation
+                </a>
+            </div>
+        </div>
+    </Authorized>
+</AuthorizeView>
 <br />
 <hr />
 <div class="row">
     <br />
     <div class="mb-3">
-        <label asp-for="Searching" class="form-control">Search Sexual Orientation 
+        <label asp-for="Searching" class="form-control">
+            Search Sexual Orientation
             @if (Searching.Length > 0)
             {
                 <button class="btn btn-light" @onclick="SearchingReset"><i class="bi bi-arrow-counterclockwise" data-toggle="tooltip" title="Reset Search" /> </button>

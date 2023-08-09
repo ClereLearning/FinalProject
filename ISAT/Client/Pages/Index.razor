@@ -1,7 +1,83 @@
 ﻿@page "/"
-
+@using Microsoft.AspNetCore.Components.Authorization;
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@using System.Security.Claims
 <PageTitle>Index</PageTitle>
 
 <h3>News</h3>
 
 News area
+
+<!--
+<AuthorizeView>
+    <Authorized>
+        <br />
+
+            @foreach (var claim in claims)
+            {
+                <p>@claim.Type: @claim.Value</p>
+            }
+        <br />
+        @what
+    </Authorized>
+</AuthorizeView>
+
+<br />
+
+<AuthorizeView Roles="Interviewer">
+    <Authorized>
+        Interviewer
+    </Authorized>
+</AuthorizeView>
+-->
+
+@code
+{
+    /*
+     * 
+     * testing roles
+
+    [CascadingParameter]
+
+    public string what { get; set; }
+
+    private IEnumerable<Claim> claims = Enumerable.Empty<Claim>();
+
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        var stateProvider = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var CurrentUser = stateProvider.User;
+
+
+
+        if (CurrentUser.Identity is not null && CurrentUser.Identity.IsAuthenticated)
+        {
+
+            var identity = (System.Security.Claims.ClaimsIdentity)CurrentUser.Identity;
+            var roleClaims = identity.FindAll(identity.RoleClaimType).ToArray();
+
+            if (CurrentUser.IsInRole("Interviewer")) { what = " yes "; }
+
+            foreach (var item in roleClaims)
+            {
+                what += item.Value + " - ";
+            }
+            what += " ------ ";
+            foreach (var item in identity.Claims)
+            {
+                what += item.Value + " - ";
+            }
+        }
+
+
+        if ((CurrentUser.Identity != null) && (CurrentUser.Identity.IsAuthenticated))
+        {
+            claims = CurrentUser.Claims;
+        }
+    }
+    */
+
+}

@@ -16,25 +16,25 @@
 <hr />
 <div class="row">
     <br />
-    <div class="mb-3">        
+    <div class="mb-3">
         <label asp-for="Searching" class="form-control">
-            Search Interview by : 
+            Search Interview by :
             @if (Searching.Length > 0)
             {
                 <button class="btn btn-light" @onclick="SearchingReset"><i class="bi bi-arrow-counterclockwise" data-toggle="tooltip" title="Reset Search" /> </button>
             }
-        </label>                   
+        </label>
         <InputRadioGroup Name="SearchingBy" @bind-Value="@SearchingByDate">
-            <InputRadio Name="SearchingBy" Value="true"/> Date
+            <InputRadio Name="SearchingBy" Value="true" /> Date
             <InputDate id="SearchingDate" @bind-Value="SearchingDate" Type="InputDateType.Date" class="form-control" aria-required="true" @onblur="@(x => SearchFor())" @onfocus="@(b=> SearchingByDate=true)"></InputDate>
             <div class="form-group">
-                <button @onclick="SearchFor" class="btn btn-primary">Search</button>               
+                <button @onclick="SearchFor" class="btn btn-primary">Search</button>
             </div>
-            <InputRadio Name="SearchingBy" Value="false"/>Social Name
+            <InputRadio Name="SearchingBy" Value="false" />Social Name
             <InputText id="Searching" @bind-Value="Searching" class="form-control" aria-required="true" @onfocus="@(b=> SearchingByDate=false)" @onkeypress="SearchFor" @onkeydown="SearchFor" @onkeyup="SearchFor"></InputText>
-        </InputRadioGroup>       
+        </InputRadioGroup>
     </div>
-    
+
 
 </div>
 <hr />
@@ -63,7 +63,7 @@ else
         <PropertyColumn Property="i=> i.Date" Title="Date" Format="dd/MM" Sortable="true" />
         <PropertyColumn Property="i=> i.StartTime" Title="Start Time" Format="HH:mm" Sortable="true" />
         <PropertyColumn Property="i=> i.EndTime" Title="End Time" Format="HH:mm" Sortable="true" />
-        <PropertyColumn Property="i=> i.Interviewee.SocialName" Title="Social Name" Sortable="true" />       
+        <PropertyColumn Property="i=> i.Interviewee.SocialName" Title="Social Name" Sortable="true" />
         @if (showEmail)
         {
             <PropertyColumn Property="i => i.Interviewee.Email" Title="E-mail" Sortable="true" />
@@ -84,6 +84,7 @@ else
             <PropertyColumn Property="i => i.Interviewee.Observation" Title="Observation" Sortable="true" />
         }
 
+
         <TemplateColumn>
             @if (context.InterviewStatusId < 5)
             {
@@ -93,7 +94,6 @@ else
 
                 <button class="btn btn-primary" onclick="@(() => CancelIt(context))" data-toggle="tooltip" title="Cancel"><i class="bi bi-journal-minus" /></button>
             }
-
         </TemplateColumn>
     </QuickGrid>
     <Paginator State="@pagination" />
@@ -157,7 +157,7 @@ else
             }
         }
 
-        SearchingByDate = true;        
+        SearchingByDate = true;
         SearchingDate = DateTime.Today;
         await GetInterviews();
         SearchFor();

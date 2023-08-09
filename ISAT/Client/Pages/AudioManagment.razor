@@ -10,27 +10,27 @@
 @attribute [Authorize]
 
 <PageTitle> Audio Managment </PageTitle>
-<AuthorizeView>
+<AuthorizeView Roles="Interviewer">
     <Authorized>
-        <h3>Audio Managment @context.User.Identity!.Name </h3>
+        <br />
+        <hr />
+        <div class="row">
+            <div class="col-md-6">
+                <a href='/interviewaddedit' class="btn btn-primary" role="button">
+                    <i class="oi oi-plus"></i>
+                    Upload
+                </a>
+            </div>
+        </div>
     </Authorized>
 </AuthorizeView>
 <br />
 <hr />
 <div class="row">
-    <div class="col-md-6">
-        <a href='/interviewaddedit' class="btn btn-primary" role="button">
-            <i class="oi oi-plus"></i>
-            Upload
-        </a>
-    </div>
-</div>
-<br />
-<hr />
-<div class="row">
     <br />
     <div class="mb-3">
-        <label asp-for="Searching" class="form-control">Search Interview 
+        <label asp-for="Searching" class="form-control">
+            Search Interview
             @if (Searching.Length > 0)
             {
                 <button class="btn btn-light" @onclick="SearchingReset"><i class="bi bi-arrow-counterclockwise" data-toggle="tooltip" title="Reset Search" /> </button>
@@ -59,7 +59,7 @@ else
             <PropertyColumn Property="i=> i.Interviewee.FirstName" Title="First Name" Sortable="true" />
         }
 
-        @if(ShowLastName)
+        @if (ShowLastName)
         {
             <PropertyColumn Property="i=> i.Interviewee.LastName" Title="Last Name" Sortable="true" />
         }
@@ -95,15 +95,15 @@ else
     Guid InterviewerId { get; set; }
 
     protected void SearchFor()
-    {           
+    {
 
         if (!string.IsNullOrEmpty(Searching))
         {
             interviewList = searchInterviewList.Where(x => (x.Interviewee.SocialName.IndexOf(Searching, StringComparison.OrdinalIgnoreCase) != -1))
-            .ToList();            
+            .ToList();
         }
         else
-        {                    
+        {
             interviewList = searchInterviewList;
         }
     }
@@ -129,7 +129,7 @@ else
     protected async Task GetInterviews()
     {
         interviewList = await InterviewService.GetGetAudioInterviews();
-        
+
         // if ClaimInterviewer
         interviewList = interviewList.Where(i => i.InterviewerId == InterviewerId).ToList();
 

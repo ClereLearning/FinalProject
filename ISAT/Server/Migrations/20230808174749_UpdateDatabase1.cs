@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -7,13 +8,28 @@
 namespace ISAT.Server.Migrations
 {
     /// <inheritdoc />
-    public partial class UpdateDatabase : Migration
+    public partial class UpdateDatabase1 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.EnsureSchema(
                 name: "dbo");
+
+            migrationBuilder.CreateTable(
+                name: "AspNetRoles",
+                schema: "dbo",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    NormalizedName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    ConcurrencyStamp = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AspNetRoles", x => x.Id);
+                });
 
             migrationBuilder.CreateTable(
                 name: "DeviceCodes",
@@ -128,21 +144,6 @@ namespace ISAT.Server.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Roles",
-                schema: "dbo",
-                columns: table => new
-                {
-                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
-                    NormalizedName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
-                    ConcurrencyStamp = table.Column<string>(type: "nvarchar(max)", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Roles", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "SexualOrientation",
                 schema: "dbo",
                 columns: table => new
@@ -154,32 +155,6 @@ namespace ISAT.Server.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_SexualOrientation", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "User",
-                schema: "dbo",
-                columns: table => new
-                {
-                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    UserName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    NormalizedUserName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Email = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    NormalizedEmail = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    EmailConfirmed = table.Column<bool>(type: "bit", nullable: false),
-                    PasswordHash = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    SecurityStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ConcurrencyStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    PhoneNumberConfirmed = table.Column<bool>(type: "bit", nullable: false),
-                    TwoFactorEnabled = table.Column<bool>(type: "bit", nullable: false),
-                    LockoutEnd = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
-                    LockoutEnabled = table.Column<bool>(type: "bit", nullable: false),
-                    AccessFailedCount = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_User", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -195,6 +170,29 @@ namespace ISAT.Server.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_UsersType", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "AspNetRoleClaims",
+                schema: "dbo",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    RoleId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    ClaimType = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ClaimValue = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AspNetRoleClaims", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_AspNetRoleClaims_AspNetRoles_RoleId",
+                        column: x => x.RoleId,
+                        principalSchema: "dbo",
+                        principalTable: "AspNetRoles",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -216,7 +214,8 @@ namespace ISAT.Server.Migrations
                     AudioStatus = table.Column<bool>(type: "bit", nullable: false),
                     FileName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Observation = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Notes = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Notes = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    InterviewerId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -233,29 +232,6 @@ namespace ISAT.Server.Migrations
                         principalSchema: "dbo",
                         principalTable: "Interviewee",
                         principalColumn: "Id");
-                });
-
-            migrationBuilder.CreateTable(
-                name: "RoleClaims",
-                schema: "dbo",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    RoleId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    ClaimType = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ClaimValue = table.Column<string>(type: "nvarchar(max)", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_RoleClaims", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_RoleClaims_Roles_RoleId",
-                        column: x => x.RoleId,
-                        principalSchema: "dbo",
-                        principalTable: "Roles",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -310,7 +286,7 @@ namespace ISAT.Server.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "UserClaims",
+                name: "AspNetUserClaims",
                 schema: "dbo",
                 columns: table => new
                 {
@@ -322,9 +298,9 @@ namespace ISAT.Server.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_UserClaims", x => x.Id);
+                    table.PrimaryKey("PK_AspNetUserClaims", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_UserClaims_AspNetUsers_UserId",
+                        name: "FK_AspNetUserClaims_AspNetUsers_UserId",
                         column: x => x.UserId,
                         principalSchema: "dbo",
                         principalTable: "AspNetUsers",
@@ -333,7 +309,7 @@ namespace ISAT.Server.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "UserLogins",
+                name: "AspNetUserLogins",
                 schema: "dbo",
                 columns: table => new
                 {
@@ -344,9 +320,9 @@ namespace ISAT.Server.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_UserLogins", x => new { x.LoginProvider, x.ProviderKey });
+                    table.PrimaryKey("PK_AspNetUserLogins", x => new { x.LoginProvider, x.ProviderKey });
                     table.ForeignKey(
-                        name: "FK_UserLogins_AspNetUsers_UserId",
+                        name: "FK_AspNetUserLogins_AspNetUsers_UserId",
                         column: x => x.UserId,
                         principalSchema: "dbo",
                         principalTable: "AspNetUsers",
@@ -355,7 +331,7 @@ namespace ISAT.Server.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "UserRoles",
+                name: "AspNetUserRoles",
                 schema: "dbo",
                 columns: table => new
                 {
@@ -364,25 +340,25 @@ namespace ISAT.Server.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_UserRoles", x => new { x.UserId, x.RoleId });
+                    table.PrimaryKey("PK_AspNetUserRoles", x => new { x.UserId, x.RoleId });
                     table.ForeignKey(
-                        name: "FK_UserRoles_AspNetUsers_UserId",
+                        name: "FK_AspNetUserRoles_AspNetRoles_RoleId",
+                        column: x => x.RoleId,
+                        principalSchema: "dbo",
+                        principalTable: "AspNetRoles",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_AspNetUserRoles_AspNetUsers_UserId",
                         column: x => x.UserId,
                         principalSchema: "dbo",
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_UserRoles_Roles_RoleId",
-                        column: x => x.RoleId,
-                        principalSchema: "dbo",
-                        principalTable: "Roles",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "UserTokens",
+                name: "AspNetUserTokens",
                 schema: "dbo",
                 columns: table => new
                 {
@@ -393,9 +369,9 @@ namespace ISAT.Server.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_UserTokens", x => new { x.UserId, x.LoginProvider, x.Name });
+                    table.PrimaryKey("PK_AspNetUserTokens", x => new { x.UserId, x.LoginProvider, x.Name });
                     table.ForeignKey(
-                        name: "FK_UserTokens_AspNetUsers_UserId",
+                        name: "FK_AspNetUserTokens_AspNetUsers_UserId",
                         column: x => x.UserId,
                         principalSchema: "dbo",
                         principalTable: "AspNetUsers",
@@ -405,12 +381,23 @@ namespace ISAT.Server.Migrations
 
             migrationBuilder.InsertData(
                 schema: "dbo",
+                table: "AspNetRoles",
+                columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
+                values: new object[,]
+                {
+                    { "8d6be313-e36c-4397-97c3-6d7b74803901", null, "Interviewer", "interviewer" },
+                    { "aa87f117-a0cc-43c6-b8e5-426d4ab4b40a", null, "Administrative", "administrative" },
+                    { "f724af24-92df-46d1-8c62-7081a7384b03", null, "Researcher", "researcher" }
+                });
+
+            migrationBuilder.InsertData(
+                schema: "dbo",
                 table: "Gender",
                 columns: new[] { "Id", "Description", "Name" },
                 values: new object[,]
                 {
-                    { new Guid("6792559f-eb77-41af-9c45-ad35fbfc1350"), "Was not asked", "Not asked" },
-                    { new Guid("d01c4b42-aefb-4e31-9b03-7452705aa369"), "Asked but, not informed", "Not Informed" }
+                    { new Guid("69bacfb1-aff7-4ea1-98f4-2ce4e6e28234"), "Asked but, not informed", "Not Informed" },
+                    { new Guid("f56ec7dd-8278-473a-aade-f9f31ae4f815"), "Was not asked", "Not asked" }
                 });
 
             migrationBuilder.InsertData(
@@ -436,8 +423,8 @@ namespace ISAT.Server.Migrations
                 columns: new[] { "Id", "Description", "Name" },
                 values: new object[,]
                 {
-                    { new Guid("3315af7d-70e4-4ddd-a838-ee99f401e15e"), "Was not asked", "Not asked" },
-                    { new Guid("b17ae524-3747-45d8-9517-95cb7ca79025"), "Asked but, not informed", "Not Informed" }
+                    { new Guid("4425dea9-6407-4bf8-ba48-2cb1fa020ae9"), "Was not asked", "Not asked" },
+                    { new Guid("5819c669-1e4f-4307-a0cb-2fbc5b6e933e"), "Asked but, not informed", "Not Informed" }
                 });
 
             migrationBuilder.InsertData(
@@ -446,10 +433,42 @@ namespace ISAT.Server.Migrations
                 columns: new[] { "Id", "Deletable", "Description", "Name" },
                 values: new object[,]
                 {
-                    { new Guid("3309a5e8-23eb-4a89-b594-db0f7561212e"), false, "Administrative Users", "Administrative" },
-                    { new Guid("4e7bdfa8-0f70-4015-b820-ec22ce22083b"), false, "Interviewer Users", "Interviewer" },
-                    { new Guid("7197c2cf-207b-4550-90e2-89f676fddc73"), false, "Researcher Users", "Researcher" }
+                    { new Guid("17d9f8c9-3537-42d1-a3d2-d5cdd6e1bf16"), false, "Researcher Users", "Researcher" },
+                    { new Guid("65fcb873-4d4a-4f22-8536-045bf8e552be"), false, "Interviewer Users", "Interviewer" },
+                    { new Guid("fd5927fe-e75a-4d72-b120-d261578c2f8e"), false, "Administrative Users", "Administrative" }
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AspNetRoleClaims_RoleId",
+                schema: "dbo",
+                table: "AspNetRoleClaims",
+                column: "RoleId");
+
+            migrationBuilder.CreateIndex(
+                name: "RoleNameIndex",
+                schema: "dbo",
+                table: "AspNetRoles",
+                column: "NormalizedName",
+                unique: true,
+                filter: "[NormalizedName] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AspNetUserClaims_UserId",
+                schema: "dbo",
+                table: "AspNetUserClaims",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AspNetUserLogins_UserId",
+                schema: "dbo",
+                table: "AspNetUserLogins",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AspNetUserRoles_RoleId",
+                schema: "dbo",
+                table: "AspNetUserRoles",
+                column: "RoleId");
 
             migrationBuilder.CreateIndex(
                 name: "EmailIndex",
@@ -537,60 +556,30 @@ namespace ISAT.Server.Migrations
                 schema: "dbo",
                 table: "PersistedGrants",
                 columns: new[] { "SubjectId", "SessionId", "Type" });
-
-            migrationBuilder.CreateIndex(
-                name: "IX_RoleClaims_RoleId",
-                schema: "dbo",
-                table: "RoleClaims",
-                column: "RoleId");
-
-            migrationBuilder.CreateIndex(
-                name: "RoleNameIndex",
-                schema: "dbo",
-                table: "Roles",
-                column: "NormalizedName",
-                unique: true,
-                filter: "[NormalizedName] IS NOT NULL");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_UserClaims_UserId",
-                schema: "dbo",
-                table: "UserClaims",
-                column: "UserId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_UserLogins_UserId",
-                schema: "dbo",
-                table: "UserLogins",
-                column: "UserId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_UserRoles_RoleId",
-                schema: "dbo",
-                table: "UserRoles",
-                column: "RoleId");
-
-            migrationBuilder.Sql(@"
-create view Interviewers as 
-select 
-Id, 
-UserName,
-Email,
-FirstName, 
-LastName,
-SocialName, 
-GenderId,
-SexualOrientationId,
-UsersTypeId,
-Inactive 
-from AspnetUsers;
-            ");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.Sql(@"drop view Interviewers;");
+            migrationBuilder.DropTable(
+                name: "AspNetRoleClaims",
+                schema: "dbo");
+
+            migrationBuilder.DropTable(
+                name: "AspNetUserClaims",
+                schema: "dbo");
+
+            migrationBuilder.DropTable(
+                name: "AspNetUserLogins",
+                schema: "dbo");
+
+            migrationBuilder.DropTable(
+                name: "AspNetUserRoles",
+                schema: "dbo");
+
+            migrationBuilder.DropTable(
+                name: "AspNetUserTokens",
+                schema: "dbo");
 
             migrationBuilder.DropTable(
                 name: "DeviceCodes",
@@ -609,27 +598,11 @@ from AspnetUsers;
                 schema: "dbo");
 
             migrationBuilder.DropTable(
-                name: "RoleClaims",
+                name: "AspNetRoles",
                 schema: "dbo");
 
             migrationBuilder.DropTable(
-                name: "User",
-                schema: "dbo");
-
-            migrationBuilder.DropTable(
-                name: "UserClaims",
-                schema: "dbo");
-
-            migrationBuilder.DropTable(
-                name: "UserLogins",
-                schema: "dbo");
-
-            migrationBuilder.DropTable(
-                name: "UserRoles",
-                schema: "dbo");
-
-            migrationBuilder.DropTable(
-                name: "UserTokens",
+                name: "AspNetUsers",
                 schema: "dbo");
 
             migrationBuilder.DropTable(
@@ -638,14 +611,6 @@ from AspnetUsers;
 
             migrationBuilder.DropTable(
                 name: "Interviewee",
-                schema: "dbo");
-
-            migrationBuilder.DropTable(
-                name: "Roles",
-                schema: "dbo");
-
-            migrationBuilder.DropTable(
-                name: "AspNetUsers",
                 schema: "dbo");
 
             migrationBuilder.DropTable(

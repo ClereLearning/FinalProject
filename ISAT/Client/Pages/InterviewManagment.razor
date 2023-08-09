@@ -13,21 +13,26 @@
 
 <h3>List of Interviews</h3>
 <br />
-<hr />
-<div class="row">
-    <div class="col-md-6">
-        <a href='/interviewaddedit' class="btn btn-primary" role="button">
-            <i class="oi oi-plus"></i>
-            Add Interview
-        </a>
-    </div>
-</div>
-<br />
+<AuthorizeView Roles="Interviewer">
+    <Authorized>
+        <hr />
+        <div class="row">
+            <div class="col-md-6">
+                <a href='/interviewaddedit' class="btn btn-primary" role="button">
+                    <i class="oi oi-plus"></i>
+                    Add Interview
+                </a>
+            </div>
+        </div>
+        <br />
+    </Authorized>
+</AuthorizeView>
 <hr />
 <div class="row">
     <br />
     <div class="mb-3">
-        <label asp-for="Searching" class="form-control">Search Interview 
+        <label asp-for="Searching" class="form-control">
+            Search Interview
             @if (Searching.Length > 0)
             {
                 <button class="btn btn-light" @onclick="SearchingReset"><i class="bi bi-arrow-counterclockwise" data-toggle="tooltip" title="Reset Search" /> </button>
@@ -75,9 +80,9 @@ else
     protected List<Interview> searchInterviewList = new();
 
     PaginationState pagination = new PaginationState { ItemsPerPage = 20 };
-    
+
     Guid InterviewerId { get; set; }
-    
+
 
     protected void SearchFor()
     {
@@ -94,7 +99,7 @@ else
     }
 
     protected override async Task OnInitializedAsync()
-    {        
+    {
         var stateProvider = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         var CurrentUser = stateProvider.User;
 
@@ -117,7 +122,7 @@ else
 
         // if ClaimInterviewer
         interviewList = interviewList.Where(i => i.InterviewerId == InterviewerId).ToList();
-        
+
         interviewList = interviewList.OrderBy(x => x.StartTime).ToList();
         searchInterviewList = interviewList;
     }

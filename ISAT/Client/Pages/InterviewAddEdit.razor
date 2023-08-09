@@ -334,12 +334,22 @@ else
 
     protected override async Task OnParametersSetAsync()
     {
+
+
+        interviewee = interviewees.FirstOrDefault();
+
+        if (interviewee == null)        
+        {
+            DisplayContentAlert = " There is no Interviewee. Please, first add an Interviewee. ";
+            DisplayAlert = "";
+            return;
+        }
+
         @if (Id == Guid.Empty)
         {
             interviewStatus = interviewsStatus.Where(x => x.Status.IndexOf("New", StringComparison.OrdinalIgnoreCase) != -1).FirstOrDefault();
-            interview.InterviewStatusId = interviewStatus.Id;
+            interview.InterviewStatusId = interviewStatus.Id;            
 
-            interviewee = interviewees.FirstOrDefault();
             interview.IntervieweeId = interviewee.Id;
 
             var Schedules = await InterviewService.GetInterviews();

@@ -280,13 +280,13 @@ namespace ISAT.Server.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("061298d2-9a7c-43d0-ae5f-ca77bf5f64e2"),
+                            Id = new Guid("f56ec7dd-8278-473a-aade-f9f31ae4f815"),
                             Description = "Was not asked",
                             Name = "Not asked"
                         },
                         new
                         {
-                            Id = new Guid("3dfa3014-20dd-4ca8-aefc-476635d27186"),
+                            Id = new Guid("69bacfb1-aff7-4ea1-98f4-2ce4e6e28234"),
                             Description = "Asked but, not informed",
                             Name = "Not Informed"
                         });
@@ -562,13 +562,13 @@ namespace ISAT.Server.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("10526339-0329-48f9-b2d8-6dc4ce3ee34b"),
+                            Id = new Guid("4425dea9-6407-4bf8-ba48-2cb1fa020ae9"),
                             Description = "Was not asked",
                             Name = "Not asked"
                         },
                         new
                         {
-                            Id = new Guid("5bc47d05-745d-49a8-a12f-545d53230978"),
+                            Id = new Guid("5819c669-1e4f-4307-a0cb-2fbc5b6e933e"),
                             Description = "Asked but, not informed",
                             Name = "Not Informed"
                         });
@@ -598,21 +598,21 @@ namespace ISAT.Server.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("f691dbf1-e126-431c-b7a3-1bc23ae070d6"),
+                            Id = new Guid("fd5927fe-e75a-4d72-b120-d261578c2f8e"),
                             Deletable = false,
                             Description = "Administrative Users",
                             Name = "Administrative"
                         },
                         new
                         {
-                            Id = new Guid("a8955dd5-a326-4223-abd0-78d0e11bbe53"),
+                            Id = new Guid("65fcb873-4d4a-4f22-8536-045bf8e552be"),
                             Deletable = false,
                             Description = "Interviewer Users",
                             Name = "Interviewer"
                         },
                         new
                         {
-                            Id = new Guid("55132f64-4e77-4cce-a565-9f3c315b92e0"),
+                            Id = new Guid("17d9f8c9-3537-42d1-a3d2-d5cdd6e1bf16"),
                             Deletable = false,
                             Description = "Researcher Users",
                             Name = "Researcher"
@@ -643,7 +643,27 @@ namespace ISAT.Server.Migrations
                         .HasDatabaseName("RoleNameIndex")
                         .HasFilter("[NormalizedName] IS NOT NULL");
 
-                    b.ToTable("Roles", "dbo");
+                    b.ToTable("AspNetRoles", "dbo");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "aa87f117-a0cc-43c6-b8e5-426d4ab4b40a",
+                            Name = "Administrative",
+                            NormalizedName = "administrative"
+                        },
+                        new
+                        {
+                            Id = "8d6be313-e36c-4397-97c3-6d7b74803901",
+                            Name = "Interviewer",
+                            NormalizedName = "interviewer"
+                        },
+                        new
+                        {
+                            Id = "f724af24-92df-46d1-8c62-7081a7384b03",
+                            Name = "Researcher",
+                            NormalizedName = "researcher"
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -668,59 +688,7 @@ namespace ISAT.Server.Migrations
 
                     b.HasIndex("RoleId");
 
-                    b.ToTable("RoleClaims", "dbo");
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUser", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<int>("AccessFailedCount")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ConcurrencyStamp")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Email")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("EmailConfirmed")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("LockoutEnabled")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTimeOffset?>("LockoutEnd")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<string>("NormalizedEmail")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("NormalizedUserName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PasswordHash")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PhoneNumber")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("PhoneNumberConfirmed")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("SecurityStamp")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("TwoFactorEnabled")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("UserName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("User", "dbo");
+                    b.ToTable("AspNetRoleClaims", "dbo");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
@@ -745,7 +713,7 @@ namespace ISAT.Server.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("UserClaims", "dbo");
+                    b.ToTable("AspNetUserClaims", "dbo");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
@@ -769,7 +737,7 @@ namespace ISAT.Server.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("UserLogins", "dbo");
+                    b.ToTable("AspNetUserLogins", "dbo");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
@@ -784,7 +752,7 @@ namespace ISAT.Server.Migrations
 
                     b.HasIndex("RoleId");
 
-                    b.ToTable("UserRoles", "dbo");
+                    b.ToTable("AspNetUserRoles", "dbo");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
@@ -805,7 +773,7 @@ namespace ISAT.Server.Migrations
 
                     b.HasKey("UserId", "LoginProvider", "Name");
 
-                    b.ToTable("UserTokens", "dbo");
+                    b.ToTable("AspNetUserTokens", "dbo");
                 });
 
             modelBuilder.Entity("ISAT.Server.Models.ApplicationUser", b =>
