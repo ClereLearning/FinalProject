@@ -1,0 +1,184 @@
+﻿@page "/audioaddedit"
+@page "/audioaddedit/{Id:guid}"
+@using ISAT.Shared.Models
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@using System.Globalization;
+@inject IInterviewService InterviewService
+@inject IIntervieweeService IntervieweeService
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
+@inject HttpClient Http
+@attribute [Authorize]
+
+@if (Id != Guid.Empty)
+{
+
+    <PageTitle>
+        Upload audio interview from @interviewee.SocialName @interview.StartTime.ToLongDateString() @interview.StartTime.ToShortTimeString()
+    </PageTitle>
+
+    <h3>Upload audio interview from @interviewee.SocialName <br /> @interview.StartTime.ToLongDateString() @interview.StartTime.ToShortTimeString() </h3>
+
+}
+else
+{
+    <h3>not allowed</h3>
+}
+
+<br />
+<hr />
+<div>
+    <div class="row">
+        <div class="mb-3">
+            <label asp-for="Audio File" class="form-control">Select the audio file</label>
+            <InputFile OnChange="@LoadFileInfo" />
+        </div>
+        @if (file != null)
+        {
+
+            <div class="mb-3">
+                <label asp-for="File Name" class="form-control">Name</label>
+                @file.Name
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="File Size" class="form-control">Size (kbytes)</label>
+                (@file.Size / 1024)
+            </div>
+            <div class="mb-3">
+                <label asp-for="File Size" class="form-control">Last modified date</label>
+                @file.LastModified
+            </div>
+        }
+    </div>
+    <div>
+        <div class="alert alert-primary @DisplayAlert" role="alert">
+            @DisplayContentAlert
+        </div>
+    </div>
+    <div class="form-group">
+        <button type="submit" class="btn btn-primary" @onclick="HandleSubmit">@btnLabel</button>
+        <button type="button" class="btn btn-light" @onclick="Cancel">Cancel</button>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+
+    public Guid Id { get; set; }
+
+    Interview interview = new Interview() { };
+
+    protected List<Interview> interviews = new();
+
+    protected Interviewee interviewee = new Interviewee();
+
+    Guid InterviewerId { get; set; }
+
+    string btnLabel = string.Empty;
+
+    protected long maxSize = 100 * 1024; // 100 kbytes
+
+    protected IBrowserFile file;
+
+    private string DisplayAlert { get; set; } = "d-none";
+
+    private string DisplayContentAlert { get; set; } = "";
+
+    private async Task LoadFileInfo(InputFileChangeEventArgs e)
+    {
+        if (e.FileCount > 1)
+        {
+            DisplayContentAlert = "Please select only one audio file";
+            DisplayAlert = "";
+        }
+        else
+        {
+            file = e.File;
+        }
+
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        btnLabel = !String.IsNullOrEmpty(Id.ToString()) ? "Save" : "Upload";
+    }
+
+    async Task HandleSubmit()
+    {
+        @if (!(Id == Guid.Empty))
+        {
+            if (file != null)
+            {
+                if (file.Size > maxSize)
+                {
+                    DisplayContentAlert = "Please, audio file has " + (file.Size / 1024 )+ " must be less than " + (maxSize/1024) + " kbytes ";
+                    DisplayAlert = "";
+                    return;
+                }
+
+                btnLabel = "Update";
+                interview.Interviewee = null;
+                interview.InterviewStatus = null;
+                interview.InterviewStatusId = 7; // Interviewed
+                interview.AudioStatus = true;
+                interview.AudioDate = DateTime.Now;
+                interview.FileName = file.Name;
+
+                byte[] content;
+                
+                /*using (var bReader = new BinaryReader(file.OpenReadStream(maxSize)))
+                {
+                    content = bReader.ReadBytes((int)file.OpenReadStream(maxSize).Length);
+                }
+                */
+
+               using (MemoryStream memoryStream = new MemoryStream())
+                {
+                    file.OpenReadStream(maxSize).CopyToAsync(memoryStream);
+                    content = memoryStream.ToArray();
+                }
+
+                interview.AudioFile = content;
+
+                //interview.Notes
+                await InterviewService.PutInterview(Id, interview);
+                DisplayContentAlert = "Audio file Uploaded";
+                DisplayAlert = "";
+                NavigationManager.NavigateTo("/audiomanagment", true);
+            }
+            else
+            {
+                DisplayContentAlert = "Please, select an audio file";
+                DisplayAlert = "";
+            }
+
+        }
+        else
+        {
+            DisplayContentAlert = "Please, select an interview to upload an audio";
+            DisplayAlert = "";
+        }
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        @if (Id == Guid.Empty)
+        {
+            // create a gender
+
+        }
+        else
+        {
+            interview = await InterviewService.GetInterview(Id);
+            interviewee = interview.Interviewee;
+        }
+    }
+
+    protected void Cancel()
+    {
+        NavigationManager.NavigateTo("/audiomanagment",true);
+    }
+
+}

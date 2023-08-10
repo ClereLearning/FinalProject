@@ -14,20 +14,6 @@
 <h3>Audio Managment</h3>
 <br />
 <button class="btn btn-light" @onclick="PrintIt"><i class="bi bi-printer" data-toggle="tooltip" title="Print" /> </button>
-<AuthorizeView Roles="Interviewer">
-    <Authorized>
-        <br />
-        <hr />
-        <div class="row">
-            <div class="col-md-6">
-                <a href='/interviewaddedit' class="btn btn-primary" role="button">
-                    <i class="oi oi-plus"></i>
-                    Upload
-                </a>
-            </div>
-        </div>
-    </Authorized>
-</AuthorizeView>
 <br />
 <hr />
 <div class="row">
@@ -69,14 +55,15 @@ else
         }
         <PropertyColumn Property="i=> i.Date" Title="Interview Date" Format="dd/MM/yyyy" Sortable="true" />
         <PropertyColumn Property="i => i.Place" Title="Place" Sortable="true" />
-        <PropertyColumn Property="i => i.InterviewStatus.Status" Title="Status" Sortable="true" />
-        <!--
+        <PropertyColumn Property="i => i.InterviewStatus.Status" Title="Status" Sortable="true" />        
+        <PropertyColumn Property="i=> i.FileName" Title="Audio Upload Date" Sortable="true" />
         <PropertyColumn Property="i=> i.AudioDate" Title="Audio Upload Date" Sortable="true" />
         <PropertyColumn Property="i=> i.AudioStatus" Title="Audio Status" Sortable="true" />
-        -->
-        <TemplateColumn>
-            <button class="btn btn-primary" onclick="@(() => EditIt(context))"><i class="oi oi-pencil" /></button>
-            <button class="btn btn-primary" onclick="@(() => DeleteIt(context))"><i class="oi oi-trash" /></button>
+                <TemplateColumn>
+            @if (CanEdit)
+            {
+                <button class="btn btn-primary" onclick="@(() => UploadIt(context))"><i class="bi bi-cloud-arrow-up" /></button> 
+            }
         </TemplateColumn>
     </QuickGrid>
     <Paginator State="@pagination" />
@@ -98,6 +85,10 @@ else
 
     Guid InterviewerId { get; set; }
 
+    Boolean CanEdit { get; set; }
+
+    Boolean CanSeeMore { get; set; }
+
     protected void SearchFor()
     {
 
@@ -117,6 +108,26 @@ else
         var stateProvider = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         var CurrentUser = stateProvider.User;
 
+        if (CurrentUser.IsInRole("Interviewer"))
+        {
+
+            CanEdit = true;
+        }
+        else
+        {
+            CanEdit = true;
+        }
+
+
+        if (CurrentUser.IsInRole("Researcher") || CurrentUser.IsInRole("Administrative"))
+        {
+            CanSeeMore = true;
+        }
+        else
+        {
+            CanSeeMore = false;
+        }
+
         foreach (var claim in CurrentUser.Claims)
         {
             if (claim.Type == "sub")
@@ -134,8 +145,11 @@ else
     {
         interviewList = await InterviewService.GetGetAudioInterviews();
 
-        // if ClaimInterviewer
-        interviewList = interviewList.Where(i => i.InterviewerId == InterviewerId).ToList();
+        if (!CanSeeMore)
+        {
+            // if ClaimInterviewer
+            interviewList = interviewList.Where(i => i.InterviewerId == InterviewerId).ToList();
+        }
 
         searchInterviewList = interviewList;
     }
@@ -152,22 +166,11 @@ else
         interviewList = searchInterviewList;
     }
 
-    public void EditIt(Interview i)
+    public void UploadIt(Interview i)
     {
-        NavigationManager.NavigateTo($"interviewaddedit/{i.Id}");
+        NavigationManager.NavigateTo($"audioaddedit/{i.Id}");
     }
-
-    public async void DeleteIt(Interview i)
-    {
-        Searching = "";
-        @if (!(i.Id == Guid.Empty))
-        {
-            await InterviewService.DeleteInterview(i.Id);
-        }
-        Cancel();
-
-    }
-
+    
     protected async Task PrintIt()
     {
         await Ijs.InvokeVoidAsync("window.print");
