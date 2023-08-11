@@ -26,13 +26,13 @@ jobs:
       
       - name: Install dependencies
         run: dotnet restore
-        working-directory: ./ISAT/ISAT.sln
+        working-directory: ISAT/ISAT.sln
 
       - name: Build with dotnet
-        run: dotnet build ./ISAT/ISAT.sln --configuration Release
+        run: dotnet build ISAT/ISAT.sln --configuration Release
 
       - name: dotnet publish
-        run: dotnet publish ./ISAT/ISAT.sln -c Release -o ${{env.DOTNET_ROOT}}/myapp
+        run: dotnet publish ISAT/ISAT.sln -c Release -o ${{env.DOTNET_ROOT}}/myapp
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v2
