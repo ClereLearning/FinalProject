@@ -12,6 +12,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env: 
+       working-directory: ./ISAT
 
     steps:
       - uses: actions/checkout@v2
@@ -21,12 +23,16 @@ jobs:
         with:
           dotnet-version: '8.x'
           include-prerelease: true
+      
+      - name: Install dependencies
+        run: dotnet restore
+        working-directory: ./ISAT/ISAT.sln
 
       - name: Build with dotnet
-        run: dotnet build --configuration Release
+        run: dotnet build ./ISAT/ISAT.sln --configuration Release
 
       - name: dotnet publish
-        run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/myapp
+        run: dotnet publish ./ISAT/ISAT.sln -c Release -o ${{env.DOTNET_ROOT}}/myapp
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v2
