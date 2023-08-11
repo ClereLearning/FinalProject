@@ -26,7 +26,7 @@ jobs:
       
       - name: Install dependencies
         run: dotnet restore
-        working-directory: ISAT/ISAT.sln
+        working-directory: ISAT
 
       - name: Build with dotnet
         run: dotnet build ISAT/ISAT.sln --configuration Release
